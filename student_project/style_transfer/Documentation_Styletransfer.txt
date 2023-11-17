@@ -1,0 +1,7 @@
+!!! IF LARGE DATASET (imagenet, paintings, ...) NOT IN FOLDER NAMED "DATA", THEN ADD THE FOLDER NAME TO THE .gitignore FILE!!!
+
+1.) Get Tiny imagenet from:  https://github.com/pytorch/vision/issues/6127
+2.) Get raw paintings for style from: https://www.kaggle.com/c/painter-by-numbers/data
+3.) get style models vgg and decoder from download section here: https://github.com/naoto0804/pytorch-AdaIN/tree/master
+4.) Get all the code for stylizing from: https://github.com/rgeirhos/Stylized-ImageNet/tree/master
+5.) In script "general.py": Adjust paths for the models, the image dataset, the painting dataset and the output directory
