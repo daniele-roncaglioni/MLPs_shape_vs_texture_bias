@@ -1,11 +1,11 @@
 import json
+from pathlib import Path
 
 from torch import nn
 import torch
 import numpy as np
 
 from utils.download import download, default_checkpoints
-
 
 NORMS = {
     'layer': nn.LayerNorm,
@@ -84,15 +84,15 @@ class BottleneckMLP(nn.Module):
 
         return out
 
-    def load(self, name, checkpoint_path='./checkpoints/'):
-        #if name == True:
-            # This simply assumes Imagenet21 pre-trained weights at the latest epoch available, no fine-tuning
+    def load(self, name, checkpoint_path=f'{Path(__file__).parent}/checkpoints/'):
+        # if name == True:
+        # This simply assumes Imagenet21 pre-trained weights at the latest epoch available, no fine-tuning
         #    name = default_checkpoints[self.name]
-        #elif name in ['cifar10', 'cifar100', 'imagenet']:
-            # This loads the optimal fine-tuned weights for that dataset
+        # elif name in ['cifar10', 'cifar100', 'imagenet']:
+        # This loads the optimal fine-tuned weights for that dataset
         #    name = default_checkpoints[self.name + '_' + name]
-        #else:
-            # This assumes a full path, e.g. also specifying which epoch etc
+        # else:
+        # This assumes a full path, e.g. also specifying which epoch etc
         #    name = self.name + '_' + name
         name = self.name + '_' + name
         name = default_checkpoints[name]
@@ -103,7 +103,7 @@ class BottleneckMLP(nn.Module):
 
         params = {
             k: v
-            for k, v in torch.load(weight_path).items()
+            for k, v in torch.load(weight_path, map_location='cpu').items()
         }
 
         # Load pre-trained parameters
@@ -127,25 +127,25 @@ class BottleneckBlock(nn.Module):
 def B_12_Wi_1024(dim_in, dim_out, checkpoint=None):
     block_dims = [[4 * 1024, 1024] for _ in range(12)]
     return BottleneckMLP(dim_in=dim_in, dim_out=dim_out, norm='layer', block_dims=block_dims, checkpoint=checkpoint,
-                         name='B_' + str(len(block_dims)) + '-Wi_' + str(block_dims[0][1]) + '_res_' + str(int(np.sqrt(dim_in/3))))
+                         name='B_' + str(len(block_dims)) + '-Wi_' + str(block_dims[0][1]) + '_res_' + str(int(np.sqrt(dim_in / 3))))
 
 
 def B_12_Wi_512(dim_in, dim_out, checkpoint=None):
     block_dims = [[4 * 512, 512] for _ in range(12)]
     return BottleneckMLP(dim_in=dim_in, dim_out=dim_out, norm='layer', block_dims=block_dims, checkpoint=checkpoint,
-                         name='B_' + str(len(block_dims)) + '-Wi_' + str(block_dims[0][1]) + '_res_' + str(int(np.sqrt(dim_in/3))))
+                         name='B_' + str(len(block_dims)) + '-Wi_' + str(block_dims[0][1]) + '_res_' + str(int(np.sqrt(dim_in / 3))))
 
 
 def B_6_Wi_1024(dim_in, dim_out, checkpoint=None):
     block_dims = [[4 * 1024, 1024] for _ in range(6)]
     return BottleneckMLP(dim_in=dim_in, dim_out=dim_out, norm='layer', block_dims=block_dims, checkpoint=checkpoint,
-                         name='B_' + str(len(block_dims)) + '-Wi_' + str(block_dims[0][1]) + '_res_' + str(int(np.sqrt(dim_in/3))))
+                         name='B_' + str(len(block_dims)) + '-Wi_' + str(block_dims[0][1]) + '_res_' + str(int(np.sqrt(dim_in / 3))))
 
 
 def B_6_Wi_512(dim_in, dim_out, checkpoint=None):
     block_dims = [[4 * 512, 512] for _ in range(6)]
     return BottleneckMLP(dim_in=dim_in, dim_out=dim_out, norm='layer', block_dims=block_dims, checkpoint=checkpoint,
-                         name='B_' + str(len(block_dims)) + '-Wi_' + str(block_dims[0][1]) + '_res_' + str(int(np.sqrt(dim_in/3))))
+                         name='B_' + str(len(block_dims)) + '-Wi_' + str(block_dims[0][1]) + '_res_' + str(int(np.sqrt(dim_in / 3))))
 
 
 model_list = {
@@ -157,4 +157,4 @@ model_list = {
 
 
 def get_model(architecture, checkpoint, resolution, num_classes):
-    return model_list[architecture](dim_in=resolution**2 * 3, dim_out=num_classes, checkpoint=checkpoint)
+    return model_list[architecture](dim_in=resolution ** 2 * 3, dim_out=num_classes, checkpoint=checkpoint)
