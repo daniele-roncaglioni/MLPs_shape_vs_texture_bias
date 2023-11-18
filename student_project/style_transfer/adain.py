@@ -33,7 +33,7 @@ def crop_square_and_downsample(img, downsize_size=(g.IMG_SIZE, g.IMG_SIZE)):
     right = left + new_size
     bottom = top + new_size
     img = img.crop(box=(left, top, right, bottom))
-    img.thumbnail(downsize_size, Image.ANTIALIAS)
+    img.thumbnail(downsize_size, Image.Resampling.LANCZOS)
     return img
 
 
@@ -95,7 +95,8 @@ class StyleLoader():
 
             output_tensor[i,:,:,:] = transforms.Compose([transforms.ToTensor()])(style_image)
 
-        output_tensor = output_tensor.cuda()
+        if torch.cuda.is_available():
+            output_tensor = output_tensor.cuda()
         return output_tensor
              
 
@@ -138,8 +139,9 @@ class AdaIN(StyleTransferer):
         self.vgg.load_state_dict(torch.load(self.args.vgg))
         self.vgg = nn.Sequential(*list(self.vgg.children())[:31])
 
-        self.vgg.cuda()
-        self.decoder.cuda()
+        if torch.cuda.is_available():
+            self.vgg.cuda()
+            self.decoder.cuda()
 
         self.content_transforms = get_default_transforms(self.args.content_size, self.args.crop)
         self.style_transforms = get_default_transforms(self.args.style_size, self.args.crop)
@@ -172,9 +174,10 @@ class AdaIN(StyleTransferer):
             assert content_tensor.size()[i] == style_tensor.size()[i], "size mismatch."
  
         batch_size = content_tensor.size()[0]
-  
-        style_tensor = style_tensor.cuda()
-        content_tensor = content_tensor.cuda()
+
+        if torch.cuda.is_available():
+            style_tensor = style_tensor.cuda()
+            content_tensor = content_tensor.cuda()
         output_tensor = torch.FloatTensor(content_tensor.size()).zero_()
 
         for i in range(batch_size):

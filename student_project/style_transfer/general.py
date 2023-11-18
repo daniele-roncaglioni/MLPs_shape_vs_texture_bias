@@ -13,7 +13,7 @@ from os.path import join as pjoin
 ###########################################################
 
 # HERE Dear user, please change these paths:
-IMAGENET_PATH = "../data/tiny-imagenet-200/train/n01443537/images/" # HERE specify ImageNet path
+IMAGENET_PATH = "../data/tiny-imagenet-200/" # HERE specify ImageNet path
 STYLIZED_IMAGENET_PATH = "../data/tiny-imagenet-stylized/" # HERE specify target path: where should Stylized-ImageNet be stored?
 
 

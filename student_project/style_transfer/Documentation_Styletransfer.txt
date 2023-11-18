@@ -5,3 +5,16 @@
 3.) get style models vgg and decoder from download section here: https://github.com/naoto0804/pytorch-AdaIN/tree/master
 4.) Get all the code for stylizing from: https://github.com/rgeirhos/Stylized-ImageNet/tree/master
 5.) In script "general.py": Adjust paths for the models, the image dataset, the painting dataset and the output directory
+6.) Scrip <Transform_Validation_Structure>: Transform Validation folder of Tiny Imagenet to the same format as Trainset: One folder per class, get classes from annotation-	file. Testset is useless, since no labels given
+
+
+dataloader expects folder structure as follows:
+
+-train
+------labels1
+	------img1.jpeg
+	------img2.jpeg
+	------ ....
+------labels2
+	.....
+		

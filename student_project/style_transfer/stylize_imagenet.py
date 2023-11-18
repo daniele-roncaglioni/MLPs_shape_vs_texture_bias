@@ -120,10 +120,10 @@ def main():
     #############################################################
 
     print("Preprocessing validation data:")
-    preprocess(data_loader=val_loader,
-               input_transforms=[style_transfer],
-               sourcedir=valdir,
-               targetdir=os.path.join(g.STYLIZED_IMAGENET_PATH, "val/"))
+    #preprocess(data_loader=val_loader,
+    #           input_transforms=[style_transfer],
+    #           sourcedir=valdir,
+    #           targetdir=os.path.join(g.STYLIZED_IMAGENET_PATH, "val/"))
 
     print("Preprocessing training data:")
     preprocess(data_loader=train_loader,
@@ -153,7 +153,8 @@ def preprocess(data_loader, sourcedir, targetdir,
     current_class_files = None
 
     # create list of all classes
-    all_classes = sorted(os.listdir(sourcedir))
+    #    Edited by Tristan: get classes always from train set as val and test are all in one big folder
+    all_classes = sorted(os.listdir(os.path.join(g.IMAGENET_PATH, "train/")))
 
     for i, (input, target) in enumerate(data_loader.loader):
 
@@ -175,6 +176,9 @@ def preprocess(data_loader, sourcedir, targetdir,
 
             source_class = all_classes[target[img_index]]
             source_classdir = os.path.join(sourcedir, source_class)
+            if not os.path.exists(source_classdir):
+                os.makedirs(source_classdir)
+
             assert os.path.exists(source_classdir)
 
             target_classdir = os.path.join(targetdir, source_class)
@@ -194,7 +198,7 @@ def preprocess(data_loader, sourcedir, targetdir,
                                            current_class_files[counter].replace(".JPEG", ".png"))
 
             save_image(tensor=input[img_index, :, :, :],
-                       filename=target_img_path)
+                       fp=target_img_path)
             counter += 1
 
         if i % args.print_freq == 0:
