@@ -56,8 +56,8 @@ def finetune(args):
     torch.backends.cuda.matmul.allow_tf32 = True
     device = torch.device('cuda:0' if torch.cuda.is_available() else 'cpu')
 
-    pretrained, crop_resolution, num_pretrain_classes = model_from_checkpoint(args.checkpoint) 
-    model = get_model(architecture=args.architecture, resolution=crop_resolution, num_classes=num_pretrain_classes, 
+    pretrained, crop_resolution, num_pretrain_classes = model_from_checkpoint(args.checkpoint)
+    model = get_model(architecture=args.architecture, resolution=crop_resolution, num_classes=num_pretrain_classes,
                       checkpoint=pretrained)
     args.crop_resolution = crop_resolution
 
@@ -103,7 +103,7 @@ def finetune(args):
     )
 
     model.linear_out = Linear(model.linear_out.in_features, args.num_classes)
-    model.cuda()
+    model.to(device)
 
     param_groups = [
         {
@@ -133,7 +133,7 @@ def finetune(args):
         os.makedirs(path)
         with open(path + '/config.txt', 'w') as f:
             json.dump(args.__dict__, f, indent=2)
-    
+
 
     opt = get_optimizer(args.optimizer)(param_groups, lr=args.lr)
 
@@ -160,7 +160,7 @@ def finetune(args):
             print('Test Accuracy        ', '{:.4f}'.format(test_acc))
             print('Top 5 Test Accuracy          ', '{:.4f}'.format(test_top5))
             print()
-        
+
         if ep % args.save_freq == 0 and args.save:
             torch.save(
                 model.state_dict(),
@@ -168,7 +168,7 @@ def finetune(args):
             )
 
     print('-------- Test Time Augmentation Evaluation -------')
-    
+
     num_augs = 100
     acc, top5 = test_time_aug(model, test_loader_aug, num_augs, args)
     print(num_augs, 'augmentations: Test accuracy:', acc)
