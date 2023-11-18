@@ -24,7 +24,10 @@ from train import train, test
 @torch.no_grad()
 def test_time_aug(model, loader, num_augs, args):
     model.eval()
-    all_preds = torch.zeros(len(loader.indices), model.linear_out.out_features)
+    if hasattr(loader, 'indices'):
+        all_preds = torch.zeros(len(loader.indices), model.linear_out.out_features)
+    else:
+        all_preds = torch.zeros(len(loader) * loader.batch_size, model.linear_out.out_features)
 
     for _ in tqdm(range(num_augs)):
         targets = []
@@ -58,7 +61,7 @@ def finetune(args):
 
     pretrained, crop_resolution, num_pretrain_classes = model_from_checkpoint(args.checkpoint)
     model = get_model(architecture=args.architecture, resolution=crop_resolution, num_classes=num_pretrain_classes,
-                      checkpoint=pretrained)
+                      checkpoint=pretrained, device=device)
     args.crop_resolution = crop_resolution
 
     # Get the dataloaders
@@ -87,20 +90,20 @@ def finetune(args):
         data_resolution=args.data_resolution,
         crop_resolution=args.crop_resolution,
     )
+    if not args.skip_tta:
+        test_loader_aug = get_loader(
+            args.dataset,
+            bs=args.batch_size,
+            mode='test',
+            augment=True,
+            dev=device,
+            data_path=args.data_path,
+            data_resolution=args.data_resolution,
+            crop_resolution=args.crop_resolution,
+            crop_ratio=tuple(args.crop_ratio),
+            crop_scale=tuple(args.crop_scale)
 
-    test_loader_aug = get_loader(
-        args.dataset,
-        bs=args.batch_size,
-        mode='test',
-        augment=True,
-        dev=device,
-        data_path=args.data_path,
-        data_resolution=args.data_resolution,
-        crop_resolution=args.crop_resolution,
-        crop_ratio=tuple(args.crop_ratio),
-        crop_scale=tuple(args.crop_scale)
-
-    )
+        )
 
     model.linear_out = Linear(model.linear_out.in_features, args.num_classes)
     model.to(device)
@@ -134,7 +137,6 @@ def finetune(args):
         with open(path + '/config.txt', 'w') as f:
             json.dump(args.__dict__, f, indent=2)
 
-
     opt = get_optimizer(args.optimizer)(param_groups, lr=args.lr)
 
     scheduler = get_scheduler(opt, args.scheduler, **args.__dict__)
@@ -167,12 +169,13 @@ def finetune(args):
                 path + "/epoch_" + str(ep),
             )
 
-    print('-------- Test Time Augmentation Evaluation -------')
+    if not args.skip_tta:
+        print('-------- Test Time Augmentation Evaluation -------')
 
-    num_augs = 100
-    acc, top5 = test_time_aug(model, test_loader_aug, num_augs, args)
-    print(num_augs, 'augmentations: Test accuracy:', acc)
-    print(num_augs, 'augmentations: Test Top5 accuracy:', top5)
+        num_augs = 100
+        acc, top5 = test_time_aug(model, test_loader_aug, num_augs, args)
+        print(num_augs, 'augmentations: Test accuracy:', acc)
+        print(num_augs, 'augmentations: Test Top5 accuracy:', top5)
 
 
 if __name__ == "__main__":
