@@ -59,12 +59,25 @@ def finetune(args):
     torch.backends.cuda.matmul.allow_tf32 = True
     device_str = 'cuda:0' if torch.cuda.is_available() else 'cpu'
     device = torch.device(device_str)
-    load_device = 'cpu' if device_str in ['mps', 'cpu'] else 'cuda:0'
     print(f"RUNNING ON {device}")
 
     pretrained, crop_resolution, num_pretrain_classes = model_from_checkpoint(args.checkpoint)
     model = get_model(architecture=args.architecture, resolution=crop_resolution, num_classes=num_pretrain_classes,
-                      checkpoint=pretrained, load_device=load_device)
+                      checkpoint=pretrained, load_device=device_str)
+
+    model.linear_out = Linear(model.linear_out.in_features, args.num_classes)
+    model.to(device)
+
+    if args.checkpoint_path:
+        # use local fine-tuning checkpoint instead of the ones downloaded form gDrive
+        params = {
+            k: v
+            for k, v in torch.load(args.checkpoint_path, map_location=device_str).items()
+        }
+
+        # Load pre-trained parameters
+        model.load_state_dict(params, strict=False)
+
     args.crop_resolution = crop_resolution
 
     # Get the dataloaders
@@ -108,8 +121,6 @@ def finetune(args):
 
         )
 
-    model.linear_out = Linear(model.linear_out.in_features, args.num_classes)
-    model.to(device)
 
     param_groups = [
         {
