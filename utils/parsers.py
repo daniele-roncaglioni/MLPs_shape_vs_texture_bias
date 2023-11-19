@@ -293,5 +293,23 @@ def get_finetune_parser():
         default=True,
         help="Whether to save checkpoints",
     )
+    parser.add_argument(
+        "--wandb",
+        default=False,
+        action=argparse.BooleanOptionalAction,
+        help="Whether to log with wandb",
+    )
+    parser.add_argument(
+        "--wandb_project",
+        default="shape-vs-texture",
+        type=str,
+        help="Wandb project name"
+    )
+    parser.add_argument(
+        "--wandb_entity",
+        default=None,
+        type=str,
+        help="Wandb entity name"
+    )
 
     return parser
