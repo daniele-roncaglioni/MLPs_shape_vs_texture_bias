@@ -2,6 +2,7 @@ import os
 import json
 
 import torch
+import wandb
 from torch.nn import CrossEntropyLoss, Linear
 from tqdm import tqdm
 
@@ -156,15 +157,39 @@ def finetune(args):
     scheduler = get_scheduler(opt, args.scheduler, **args.__dict__)
     loss_fn = CrossEntropyLoss(label_smoothing=args.smooth).to(device)
 
+    if args.wandb:
+        # Add your wandb credentials and project name
+        wandb.init(
+            project=args.wandb_project,
+            entity=args.wandb_entity,
+            config=args.__dict__,
+            tags=["finetune", args.dataset],
+        )
+        wandb.run.name = f'finetune {args.dataset}'
+
     for ep in range(args.epochs):
         train_acc, train_top5, train_loss, train_time = train(
             model, opt, scheduler, loss_fn, ep, train_loader, device, args
         )
+        if args.wandb:
+            wandb.log({"Training time": train_time, "Training loss": train_loss})
 
         if (ep + 1) % args.calculate_stats == 0:
             test_acc, test_top5, test_loss, test_time = test(
                 model, test_loader, loss_fn, args
             )
+
+            if args.wandb:
+                wandb.log(
+                    {
+                        "Training accuracy": train_acc,
+                        "Training Top 5 accuracy": train_top5,
+                        "Test accuracy": test_acc,
+                        "Test Top 5 accuracy": test_top5,
+                        "Test loss": test_loss,
+                        "Inference time": test_time,
+                    }
+                )
 
             # Print all the stats
             print('Epoch', ep, '       Time:', train_time)
