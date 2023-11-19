@@ -57,11 +57,14 @@ def test_time_aug(model, loader, num_augs, args):
 def finetune(args):
     # Use mixed precision matrix multiplication
     torch.backends.cuda.matmul.allow_tf32 = True
-    device = torch.device('cuda:0' if torch.cuda.is_available() else 'cpu')
+    device_str = 'cuda:0' if torch.cuda.is_available() else 'cpu'
+    device = torch.device(device_str)
+    load_device = 'cpu' if device_str in ['mps', 'cpu'] else 'cuda:0'
+    print(f"RUNNING ON {device}")
 
     pretrained, crop_resolution, num_pretrain_classes = model_from_checkpoint(args.checkpoint)
     model = get_model(architecture=args.architecture, resolution=crop_resolution, num_classes=num_pretrain_classes,
-                      checkpoint=pretrained, device=device)
+                      checkpoint=pretrained, load_device=load_device)
     args.crop_resolution = crop_resolution
 
     # Get the dataloaders
@@ -140,11 +143,11 @@ def finetune(args):
     opt = get_optimizer(args.optimizer)(param_groups, lr=args.lr)
 
     scheduler = get_scheduler(opt, args.scheduler, **args.__dict__)
-    loss_fn = CrossEntropyLoss(label_smoothing=args.smooth)
+    loss_fn = CrossEntropyLoss(label_smoothing=args.smooth).to(device)
 
     for ep in range(args.epochs):
         train_acc, train_top5, train_loss, train_time = train(
-            model, opt, scheduler, loss_fn, ep, train_loader, args
+            model, opt, scheduler, loss_fn, ep, train_loader, device, args
         )
 
         if (ep + 1) % args.calculate_stats == 0:
