@@ -17,7 +17,7 @@ from utils.optimizer import get_optimizer, get_scheduler, OPTIMIZERS_DICT, SCHED
 from utils.parsers import get_training_parser
 
 
-def train(model, opt, scheduler, loss_fn, epoch, train_loader, args):
+def train(model, opt, scheduler, loss_fn, epoch, train_loader, device, args):
     start = time.time()
     model.train()
 
@@ -25,6 +25,8 @@ def train(model, opt, scheduler, loss_fn, epoch, train_loader, args):
     total_loss = AverageMeter()
 
     for step, (ims, targs) in enumerate(tqdm(train_loader, desc="Training epoch: " + str(epoch))):
+        targs = targs.to(device)
+        ims = ims.to(device)
         ims = torch.reshape(ims, (ims.shape[0], -1))
         preds = model(ims)
 
@@ -34,7 +36,7 @@ def train(model, opt, scheduler, loss_fn, epoch, train_loader, args):
             targs = targs[:, 0].long()
             if weight != -1:
                 loss = loss_fn(preds, targs) * weight + loss_fn(preds, targs_perm) * (
-                    1 - weight
+                        1 - weight
                 )
             else:
                 loss = loss_fn(preds, targs)
@@ -49,7 +51,7 @@ def train(model, opt, scheduler, loss_fn, epoch, train_loader, args):
 
         loss = loss / args.accum_steps
         loss.backward()
-        
+
         if (step + 1) % args.accum_steps == 0 or (step + 1) == len(train_loader):
             if args.clip > 0:
                 torch.nn.utils.clip_grad_norm_(model.parameters(), args.clip)
@@ -219,7 +221,6 @@ def main(args):
             print("Test Accuracy        ", "{:.4f}".format(test_acc))
             print("Top 5 Test Accuracy          ", "{:.4f}".format(test_top5))
             print()
-
 
 
 if __name__ == "__main__":

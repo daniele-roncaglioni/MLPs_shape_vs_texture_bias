@@ -55,11 +55,11 @@ def get_loader_torch(
 
     transforms_pipeline = transforms.Compose(transforms_list)
     if dataset == 'cifar10':
-        test_set = torchvision.datasets.CIFAR10(root=f'{Path(__file__).parent}/data', train=False,
-                                                download=True, transform=transforms_pipeline)
+        data = torchvision.datasets.CIFAR10(root=f'{Path(__file__).parent}/data', train=mode == 'train',
+                                            download=True, transform=transforms_pipeline)
     elif dataset == 'cifar100':
-        test_set = torchvision.datasets.CIFAR100(root=f'{Path(__file__).parent}/data', train=False,
-                                                 download=True, transform=transforms_pipeline)
+        data = torchvision.datasets.CIFAR100(root=f'{Path(__file__).parent}/data', train=mode == 'train',
+                                             download=True, transform=transforms_pipeline)
     else:
         raise ValueError
 
@@ -69,7 +69,7 @@ def get_loader_torch(
     else:
         collate_fn = None
 
-    return torch.utils.data.DataLoader(test_set, batch_size=bs,
+    return torch.utils.data.DataLoader(data, batch_size=bs,
                                        shuffle=False, num_workers=2, collate_fn=collate_fn)
 
 
