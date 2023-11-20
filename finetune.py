@@ -8,18 +8,19 @@ from tqdm import tqdm
 
 from data_utils.data_stats import *
 from data_utils.dataloader import get_loader
-from models import get_architecture
 from models.networks import get_model
 from utils.parsers import get_finetune_parser
-from utils.config import config_to_name, model_from_config, model_from_checkpoint
+from utils.config import model_from_checkpoint
 from utils.metrics import topk_acc, real_acc
 from utils.optimizer import (
-    OPTIMIZERS_DICT,
-    SCHEDULERS,
     get_optimizer,
     get_scheduler,
 )
 from train import train, test
+from datetime import datetime
+
+now = datetime.now()
+timestamp = now.strftime("%d-%m-%y, %H:%M")
 
 
 @torch.no_grad()
@@ -122,7 +123,6 @@ def finetune(args):
 
         )
 
-
     param_groups = [
         {
             'params': [v for k, v in model.named_parameters() if 'linear_out' in k],
@@ -163,7 +163,7 @@ def finetune(args):
             project=args.wandb_project,
             entity=args.wandb_entity,
             config=args.__dict__,
-            tags=["finetune", args.dataset],
+            tags=[f" {timestamp} finetune", args.dataset],
         )
         wandb.run.name = f'finetune {args.dataset}'
 
