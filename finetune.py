@@ -176,7 +176,7 @@ def finetune(args):
 
         if (ep + 1) % args.calculate_stats == 0:
             test_acc, test_top5, test_loss, test_time = test(
-                model, test_loader, loss_fn, args
+                model, test_loader, loss_fn, device, args
             )
 
             if args.wandb:

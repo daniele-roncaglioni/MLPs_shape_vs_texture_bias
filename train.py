@@ -73,12 +73,14 @@ def train(model, opt, scheduler, loss_fn, epoch, train_loader, device, args):
 
 
 @torch.no_grad()
-def test(model, loader, loss_fn, args):
+def test(model, loader, loss_fn, device, args):
     start = time.time()
     model.eval()
     total_acc, total_top5, total_loss = AverageMeter(), AverageMeter(), AverageMeter()
 
     for ims, targs in tqdm(loader, desc="Evaluation"):
+        targs = targs.to(device)
+        ims = ims.to(device)
         ims = torch.reshape(ims, (ims.shape[0], -1))
         preds = model(ims)
 
