@@ -49,7 +49,7 @@ def get_loader_torch(
 
     if augment:
         transforms_list += [
-            transforms.RandomResizedCrop((crop_resolution, crop_resolution), scale=crop_scale, ratio=crop_ratio),
+            transforms.RandomResizedCrop((crop_resolution, crop_resolution), scale=crop_scale, ratio=crop_ratio, antialias=True),
             transforms.RandomHorizontalFlip()
         ]
 
@@ -70,7 +70,7 @@ def get_loader_torch(
         collate_fn = None
 
     return torch.utils.data.DataLoader(data, batch_size=bs,
-                                       shuffle=False, num_workers=8, collate_fn=collate_fn)
+                                       shuffle=False, num_workers=4, collate_fn=collate_fn)
 
 
 # Define an ffcv dataloader
