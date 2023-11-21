@@ -7,65 +7,65 @@ def get_training_parser():
 
     # Data
     parser.add_argument(
-        "--data_path", 
-        default="./beton", 
+        "--data_path",
+        default="./beton",
         type=str,
         help="Path to data directory"
     )
     parser.add_argument(
-        "--dataset", 
-        default="imagenet21", 
-        type=str, 
+        "--dataset",
+        default="imagenet21",
+        type=str,
         help="Dataset"
     )
     parser.add_argument(
-        "--resolution", 
-        default=64, 
-        type=int, 
+        "--resolution",
+        default=64,
+        type=int,
         help="Image Resolution"
     )
     parser.add_argument(
-        "--crop_resolution", 
-        default=None, 
-        type=int, 
+        "--crop_resolution",
+        default=None,
+        type=int,
         help="Crop Resolution"
     )
     parser.add_argument(
-        "--n_train", 
-        default=None, 
-        type=int, 
+        "--n_train",
+        default=None,
+        type=int,
         help="Number of samples. None for all"
     )
 
     # Model
     parser.add_argument(
-        "--model", 
-        default="BottleneckMLP", 
-        type=str, 
+        "--model",
+        default="BottleneckMLP",
+        type=str,
         help="Type of model"
     )
     parser.add_argument(
-        "--architecture", 
-        default="B_6-Wi_1024", 
-        type=str, 
+        "--architecture",
+        default="B_6-Wi_1024",
+        type=str,
         help="Architecture type"
     )
     parser.add_argument(
-        "--normalization", 
-        default="layer", 
-        type=str, 
+        "--normalization",
+        default="layer",
+        type=str,
         help="Normalization type"
     )
     parser.add_argument(
-        "--act", 
-        default="gelu", 
-        type=str, 
+        "--act",
+        default="gelu",
+        type=str,
         help="Normalization type"
     )
     parser.add_argument(
-        "--drop_rate", 
-        default=None, 
-        type=float, 
+        "--drop_rate",
+        default=None,
+        type=float,
         help="Drop rate for dropout"
     )
 
@@ -78,52 +78,52 @@ def get_training_parser():
         choices=OPTIMIZERS_DICT.keys(),
     )
     parser.add_argument(
-        "--batch_size", 
-        default=4096, 
-        type=int, 
+        "--batch_size",
+        default=4096,
+        type=int,
         help="Batch size"
     )
     parser.add_argument(
-        "--accum_steps", 
-        default=1, 
-        type=int, 
+        "--accum_steps",
+        default=1,
+        type=int,
         help="Number of accumulation steps"
     )
     parser.add_argument(
-        "--lr", 
-        default=0.00005, 
-        type=float, 
+        "--lr",
+        default=0.00005,
+        type=float,
         help="Learning rate"
     )
     parser.add_argument(
-        "--scheduler", 
-        type=str, 
-        default="none", 
-        choices=SCHEDULERS, 
+        "--scheduler",
+        type=str,
+        default="none",
+        choices=SCHEDULERS,
         help="Scheduler"
     )
     parser.add_argument(
-        "--weight_decay", 
-        default=0.0, 
-        type=float, 
+        "--weight_decay",
+        default=0.0,
+        type=float,
         help="Weight decay"
     )
     parser.add_argument(
-        "--epochs", 
-        default=500, 
-        type=int, 
+        "--epochs",
+        default=500,
+        type=int,
         help="Epochs"
     )
     parser.add_argument(
-        "--smooth", 
-        default=0.3, 
-        type=float, 
+        "--smooth",
+        default=0.3,
+        type=float,
         help="Amount of label smoothing"
     )
     parser.add_argument(
-        "--clip", 
-        default=0., 
-        type=float, 
+        "--clip",
+        default=0.,
+        type=float,
         help="Gradient clipping"
         )
     parser.add_argument(
@@ -139,12 +139,12 @@ def get_training_parser():
         help="Whether to augment data",
     )
     parser.add_argument(
-        "--mixup", 
-        default=0.8, 
-        type=float, 
+        "--mixup",
+        default=0.8,
+        type=float,
         help="Strength of mixup"
         )
-    
+
     # Logging
     parser.add_argument(
         "--calculate_stats",
@@ -159,9 +159,9 @@ def get_training_parser():
         help="Path to checkpoint directory",
     )
     parser.add_argument(
-        "--save_freq", 
+        "--save_freq",
         type=int,
-        default=50, 
+        default=50,
         help="Save frequency"
     )
     parser.add_argument(
@@ -177,15 +177,15 @@ def get_training_parser():
         help="Whether to log with wandb",
     )
     parser.add_argument(
-        "--wandb_project", 
-        default="mlps", 
-        type=str, 
+        "--wandb_project",
+        default="mlps",
+        type=str,
         help="Wandb project name"
     )
     parser.add_argument(
         "--wandb_entity",
-        default=None, 
-        type=str, 
+        default=None,
+        type=str,
         help="Wandb entity name"
     )
 
@@ -212,13 +212,19 @@ def get_finetune_parser():
         default=True,
         help="Whether to augment data",
     )
+    parser.add_argument(
+        "--skip_tta",
+        action=argparse.BooleanOptionalAction,
+        default=False,
+        help="Whether to skip tta",
+    )
     parser.add_argument("--mixup", default=0., type=float, help="Strength of mixup")
     parser.add_argument('--crop_scale', nargs='+', type=float, default=[0.08, 1.], help="Scale for crop at test time")
     parser.add_argument('--crop_ratio', nargs='+', type=float, default=[0.08, 1.], help="Ratio for crop at test time")
     parser.add_argument(
-        "--drop_rate", 
-        default=None, 
-        type=float, 
+        "--drop_rate",
+        default=None,
+        type=float,
         help="Drop rate for dropout"
     )
 
@@ -276,9 +282,9 @@ def get_finetune_parser():
         help="Frequency of calculating stats",
     )
     parser.add_argument(
-        "--save_freq", 
+        "--save_freq",
         type=int,
-        default=20, 
+        default=20,
         help="Save frequency"
     )
     parser.add_argument(
@@ -286,6 +292,24 @@ def get_finetune_parser():
         action=argparse.BooleanOptionalAction,
         default=True,
         help="Whether to save checkpoints",
+    )
+    parser.add_argument(
+        "--wandb",
+        default=False,
+        action=argparse.BooleanOptionalAction,
+        help="Whether to log with wandb",
+    )
+    parser.add_argument(
+        "--wandb_project",
+        default="shape-vs-texture",
+        type=str,
+        help="Wandb project name"
+    )
+    parser.add_argument(
+        "--wandb_entity",
+        default=None,
+        type=str,
+        help="Wandb entity name"
     )
 
     return parser
