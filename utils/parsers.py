@@ -267,7 +267,7 @@ def get_finetune_parser():
         "--checkpoint_path", default=None, type=str, help="Checkpoint", required=False
     )
     parser.add_argument(
-        "--checkpoint", default='checkpoints_finetune', type=str, help="Checkpoint", required=False
+        "--checkpoint", default='res_64_in21k', type=str, help="Checkpoint", required=False
     )
     parser.add_argument(
         "--body_learning_rate_multiplier",
