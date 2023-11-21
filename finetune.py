@@ -158,6 +158,7 @@ def finetune(args):
             entity=args.wandb_entity,
             config=args.__dict__,
             tags=[f" {timestamp} finetune", args.dataset],
+            dir=f'{Path(__file__).parent}/wandb/'
         )
         wandb.run.name = f'finetune {args.dataset}'
 

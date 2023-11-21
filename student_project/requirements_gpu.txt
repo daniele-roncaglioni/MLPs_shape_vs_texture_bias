@@ -5,4 +5,4 @@
 fvcore==0.1.5.post20221221
 wandb==0.16
 progressbar==2.5
-tqdm=4.66
+tqdm==4.66
