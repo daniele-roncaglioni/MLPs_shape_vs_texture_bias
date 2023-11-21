@@ -31,8 +31,8 @@ def get_architecture(
             dim_out=num_classes,
             block_dims=blocks,
             norm=normalization,
-            act=act,
-            drop_rate=drop_rate
+            # act=act,
+            # drop_rate=drop_rate
         )
 
     elif model == "MLP":

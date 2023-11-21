@@ -1,47 +1,113 @@
-import glob
 import os
-import random
+from pathlib import Path
 from typing import List
 
 import torch
 import torchvision
-from ffcv.fields.decoders import IntDecoder, NDArrayDecoder
-from ffcv.fields.rgb_image import (
-    CenterCropRGBImageDecoder,
-    RandomResizedCropRGBImageDecoder,
-)
-from ffcv.loader import Loader, OrderOption
-from ffcv.pipeline.operation import Operation
-from ffcv.transforms import (
-    Convert,
-    ImageMixup,
-    LabelMixup,
-    RandomHorizontalFlip,
-    ToDevice,
-    ToTensor,
-    ToTorchImage,
-)
-from ffcv.transforms.common import Squeeze
+from torch.utils.data import default_collate
+from torchvision.transforms import transforms
 
 from .data_stats import *
 
 
-# Define an ffcv dataloader
-def get_loader(
-    dataset,
-    bs,
-    mode,
-    augment,
-    dev,
-    data_resolution=None,
-    crop_resolution=None,
-    crop_ratio=(0.75, 1.3333333333333333),
-    crop_scale=(0.08, 1.0),
-    num_samples=None,
-    dtype=torch.float32,
-    mixup=None,
-    data_path='./beton',
+def get_loader(*args, **kwargs):
+    try:
+        import ffcv
+        return get_loader_ffcv(*args, *kwargs)
+    except ImportError:
+        return get_loader_torch(*args, **kwargs)
+
+
+def get_loader_torch(
+        dataset,
+        bs,
+        mode,
+        augment,
+        dev,
+        data_resolution=None,
+        crop_resolution=None,
+        crop_ratio=(0.75, 1.3333333333333333),
+        crop_scale=(0.08, 1.0),
+        num_samples=None,
+        dtype=torch.float32,
+        mixup=None,
+        data_path='./beton'
 ):
+    mean = MEAN_DICT[dataset]
+    std = STD_DICT[dataset]
+    if data_resolution is None:
+        data_resolution = DEFAULT_RES_DICT[dataset]
+    if crop_resolution is None:
+        crop_resolution = data_resolution
+
+    transforms_list = [
+        transforms.ToTensor(),
+        transforms.ConvertImageDtype(torch.float32),
+        transforms.Resize(size=(64, 64), antialias=True),
+        transforms.Normalize(mean, std),
+    ]
+
+    if augment:
+        transforms_list += [
+            transforms.RandomResizedCrop((crop_resolution, crop_resolution), scale=crop_scale, ratio=crop_ratio, antialias=True),
+            transforms.RandomHorizontalFlip()
+        ]
+    else:
+        transforms_list += [transforms.CenterCrop((crop_resolution, crop_resolution))]
+
+    transforms_pipeline = transforms.Compose(transforms_list)
+    if dataset == 'cifar10':
+        data = torchvision.datasets.CIFAR10(root=f'{Path(__file__).parent}/data', train=mode == 'train',
+                                            download=True, transform=transforms_pipeline)
+    elif dataset == 'cifar100':
+        data = torchvision.datasets.CIFAR100(root=f'{Path(__file__).parent}/data', train=mode == 'train',
+                                             download=True, transform=transforms_pipeline)
+    else:
+        raise ValueError
+
+    if mode == 'train' and augment and mixup > 0:
+        def collate_fn(batch):
+            return transforms.v2.MixUp(alpha=mixup, num_classes=CLASS_DICT[dataset])(*default_collate(batch))
+    else:
+        collate_fn = None
+
+    return torch.utils.data.DataLoader(data, batch_size=bs, shuffle=True, num_workers=2, collate_fn=collate_fn)
+
+
+# Define an ffcv dataloader
+def get_loader_ffcv(
+        dataset,
+        bs,
+        mode,
+        augment,
+        dev,
+        data_resolution=None,
+        crop_resolution=None,
+        crop_ratio=(0.75, 1.3333333333333333),
+        crop_scale=(0.08, 1.0),
+        num_samples=None,
+        dtype=torch.float32,
+        mixup=None,
+        data_path='./beton',
+):
+    from ffcv.fields.decoders import IntDecoder, NDArrayDecoder
+    from ffcv.fields.rgb_image import (
+        CenterCropRGBImageDecoder,
+        RandomResizedCropRGBImageDecoder,
+    )
+    from ffcv.loader import Loader, OrderOption
+    from ffcv.pipeline.operation import Operation
+    from ffcv.transforms import (
+        Convert,
+        ImageMixup,
+        LabelMixup,
+        RandomHorizontalFlip,
+        ToDevice,
+        ToTensor,
+        ToTorchImage,
+    )
+    from ffcv.transforms.common import Squeeze
+
     mode_name = MODE_DICT[dataset] if mode != 'train' else mode
     os_cache = OS_CACHED_DICT[dataset]
 
@@ -102,10 +168,10 @@ def get_loader(
         num_samples = SAMPLE_DICT[dataset] if num_samples is None else num_samples
 
         # Shuffle indices in case the classes are ordered
-        #indices = list(range(num_samples))
+        # indices = list(range(num_samples))
 
-        #random.seed(0)
-        #random.shuffle(indices)
+        # random.seed(0)
+        # random.shuffle(indices)
         indices = None
     else:
         indices = None
