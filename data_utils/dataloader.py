@@ -69,8 +69,7 @@ def get_loader_torch(
     else:
         collate_fn = None
 
-    return torch.utils.data.DataLoader(data, batch_size=bs,
-                                       shuffle=False, num_workers=2, collate_fn=collate_fn)
+    return torch.utils.data.DataLoader(data, batch_size=bs, shuffle=True, num_workers=2, collate_fn=collate_fn)
 
 
 # Define an ffcv dataloader
