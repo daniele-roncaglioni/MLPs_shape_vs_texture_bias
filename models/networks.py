@@ -110,6 +110,17 @@ class BottleneckMLP(nn.Module):
         # Load pre-trained parameters
         print('Load_state output', self.load_state_dict(params, strict=False))
 
+    def load_override(self, override_path):
+        # use local fine-tuning checkpoint instead of the ones downloaded form gDrive
+        params = {
+            k: v
+            for k, v in torch.load(override_path, map_location=self.load_device).items()
+        }
+
+        # Load pre-trained parameters
+        self.load_state_dict(params, strict=False)
+        print('Load_state overrideoutput', self.load_state_dict(params, strict=False))
+
 
 class BottleneckBlock(nn.Module):
     def __init__(self, thin, wide, act=nn.GELU()):
