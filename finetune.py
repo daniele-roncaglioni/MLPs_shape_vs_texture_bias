@@ -1,5 +1,6 @@
 import os
 import json
+from pathlib import Path
 
 import torch
 import wandb
@@ -71,14 +72,7 @@ def finetune(args):
     model.to(device)
 
     if args.checkpoint_path:
-        # use local fine-tuning checkpoint instead of the ones downloaded form gDrive
-        params = {
-            k: v
-            for k, v in torch.load(args.checkpoint_path, map_location=device_str).items()
-        }
-
-        # Load pre-trained parameters
-        model.load_state_dict(params, strict=False)
+        model.load_override(args.checkpoint_path)
 
     args.crop_resolution = crop_resolution
 
@@ -146,7 +140,7 @@ def finetune(args):
                 param.requires_grad = False
 
     # Create folder to store the checkpoints
-    path = os.path.join(args.checkpoint_folder, args.checkpoint + '_' + args.dataset)
+    path = f'{Path(__file__).parent}/{os.path.join(args.checkpoint_folder, args.checkpoint + "_" + args.dataset)}'
     if not os.path.exists(path):
         os.makedirs(path)
         with open(path + '/config.txt', 'w') as f:

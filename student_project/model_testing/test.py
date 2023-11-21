@@ -33,9 +33,12 @@ def test(model, loader, dataset):
 
 
 def predict(dataset, device='cpu'):
-    # get test data
     num_classes = CLASS_DICT[dataset]
-    model = get_model(architecture='B_6-Wi_1024', resolution=64, num_classes=num_classes, checkpoint=f'in21k_{dataset}', load_device=device).to(device)
+    model = get_model(architecture='B_6-Wi_512', resolution=64, num_classes=num_classes, checkpoint=f'in21k_{dataset}', load_device=device).to(device)
+    if True:
+        path = '/Users/roncaglionidaniele/Documents/CAS/Deep_Learning/scaling_mlps/checkpoints_finetune/res_64_in21k_cifar10_old/epoch_180'
+        model.load_override(path)
+
     test_loader = get_loader(dataset, bs=16, mode='test', augment=False, dev='cpu')
     results = test(model, test_loader, dataset)
     print(results)

@@ -1,6 +1,6 @@
 # conda create -n ds-project python=3.9
 # conda clean --all
-# pip3 install torch torchvision torchaudio --index-url https://download.pytorch.org/whl/cu118
+# pip3 install torch torchvision --index-url https://download.pytorch.org/whl/cu118
 # and then install with pip:
 fvcore==0.1.5.post20221221
 wandb==0.16
