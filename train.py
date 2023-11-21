@@ -1,6 +1,7 @@
 import os
 import time
 import json
+from pathlib import Path
 
 import torch
 import wandb
@@ -109,18 +110,21 @@ def test(model, loader, loss_fn, device, args):
 def main(args):
     # Use mixed precision matrix multiplication
     torch.backends.cuda.matmul.allow_tf32 = True
-    device = torch.device("cuda:0" if torch.cuda.is_available() else "cpu")
+    device_str = 'cuda:0' if torch.cuda.is_available() else 'cpu'
+    device = torch.device(device_str)
+    print(f"RUNNING ON {device}")
 
-    model = get_architecture(**args.__dict__).cuda()
+    model = get_architecture(**args.__dict__).to(device)
 
     # Count number of parameters for logging purposes
     args.num_params = sum(p.numel() for p in model.parameters() if p.requires_grad)
 
     # Create unique identifier
-    name = config_to_name(args)
-    path = os.path.join(args.checkpoint_folder, name)
+    # name = config_to_name(args)
+    # path = os.path.join(args.checkpoint_folder, name)
 
     # Create folder to store the checkpoints
+    path = f'{Path(__file__).parent}/train_checkpoints/{args.dataset}/'
     if not os.path.exists(path):
         os.makedirs(path)
         with open(path + '/config.txt', 'w') as f:
@@ -139,7 +143,9 @@ def main(args):
         mixup=args.mixup,
         data_path=args.data_path,
         data_resolution=args.resolution,
-        crop_resolution=args.crop_resolution
+        crop_resolution=args.crop_resolution,
+        crop_ratio=tuple(args.crop_ratio),
+        crop_scale=tuple(args.crop_scale)
     )
 
     test_loader = get_loader(
@@ -156,7 +162,7 @@ def main(args):
     start_ep = 1
     if args.reload:
         try:
-            params = torch.load(path + "/name_of_checkpoint")
+            params = torch.load(f"{Path(__file__).parent}/train_checkpoints/name_of_checkpoint")
             model.load_state_dict(params)
             start_ep = 350
         except:
@@ -165,7 +171,7 @@ def main(args):
     opt = get_optimizer(args.optimizer)(model.parameters(), lr=args.lr, weight_decay=args.weight_decay)
     scheduler = get_scheduler(opt, args.scheduler, **args.__dict__)
 
-    loss_fn = CrossEntropyLoss(label_smoothing=args.smooth)
+    loss_fn = CrossEntropyLoss(label_smoothing=args.smooth).to(device)
 
     if args.wandb:
         # Add your wandb credentials and project name
@@ -174,10 +180,11 @@ def main(args):
             entity=args.wandb_entity,
             config=args.__dict__,
             tags=["pretrain", args.dataset],
+            dir=f'{Path(__file__).parent}/wandb/'
         )
-        wandb.run.name = name
+        wandb.run.name = f'pretrain {args.dataset}'
 
-    compute_per_epoch = get_compute(model, args.n_train, args.crop_resolution)
+    compute_per_epoch = get_compute(model, args.n_train, args.crop_resolution, device)
 
     for ep in range(start_ep, args.epochs):
         calc_stats = (ep + 1) % args.calculate_stats == 0
@@ -185,7 +192,7 @@ def main(args):
         current_compute = compute_per_epoch * ep
 
         train_acc, train_top5, train_loss, train_time = train(
-            model, opt, scheduler, loss_fn, ep, train_loader, args
+            model, opt, scheduler, loss_fn, ep, train_loader, device, args
         )
 
         if args.wandb:
@@ -199,7 +206,7 @@ def main(args):
 
         if calc_stats:
             test_acc, test_top5, test_loss, test_time = test(
-                model, test_loader, loss_fn, args
+                model, test_loader, loss_fn, device, args
             )
             if args.wandb:
                 wandb.log(

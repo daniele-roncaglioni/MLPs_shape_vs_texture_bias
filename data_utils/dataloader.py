@@ -52,6 +52,8 @@ def get_loader_torch(
             transforms.RandomResizedCrop((crop_resolution, crop_resolution), scale=crop_scale, ratio=crop_ratio, antialias=True),
             transforms.RandomHorizontalFlip()
         ]
+    else:
+        transforms_list += [transforms.CenterCrop((crop_resolution, crop_resolution))]
 
     transforms_pipeline = transforms.Compose(transforms_list)
     if dataset == 'cifar10':
