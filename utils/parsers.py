@@ -125,7 +125,7 @@ def get_training_parser():
         default=0.,
         type=float,
         help="Gradient clipping"
-        )
+    )
     parser.add_argument(
         "--reload",
         action=argparse.BooleanOptionalAction,
@@ -140,10 +140,10 @@ def get_training_parser():
     )
     parser.add_argument(
         "--mixup",
-        default=0.8,
+        default=0,
         type=float,
         help="Strength of mixup"
-        )
+    )
 
     # Logging
     parser.add_argument(
@@ -188,6 +188,9 @@ def get_training_parser():
         type=str,
         help="Wandb entity name"
     )
+    parser.add_argument('--crop_scale', nargs='+', type=float, default=[0.4, 1.], help="Scale for crop at test time")
+    parser.add_argument('--crop_ratio', nargs='+', type=float, default=[1., 1.], help="Ratio for crop at test time")
+    parser.add_argument("--data_resolution", default=64, type=int, help="Image Resolution")
 
     return parser
 
@@ -219,8 +222,8 @@ def get_finetune_parser():
         help="Whether to skip tta",
     )
     parser.add_argument("--mixup", default=0., type=float, help="Strength of mixup")
-    parser.add_argument('--crop_scale', nargs='+', type=float, default=[0.08, 1.], help="Scale for crop at test time")
-    parser.add_argument('--crop_ratio', nargs='+', type=float, default=[0.08, 1.], help="Ratio for crop at test time")
+    parser.add_argument('--crop_scale', nargs='+', type=float, default=[0.4, 1.], help="Scale for crop at test time")
+    parser.add_argument('--crop_ratio', nargs='+', type=float, default=[1., 1.], help="Ratio for crop at test time")
     parser.add_argument(
         "--drop_rate",
         default=None,

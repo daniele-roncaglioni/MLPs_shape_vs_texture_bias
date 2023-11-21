@@ -7,4 +7,5 @@ checkpoints
 data
 checkpoints_finetune
 wandb
+train_checkpoints
 *.pth

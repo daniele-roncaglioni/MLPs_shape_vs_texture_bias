@@ -19,9 +19,7 @@ python3 "${HOME}/scaling_mlps_mirror/finetune.py" --architecture B_6-Wi_512 \
                                                  --batch_size 512 \
                                                  --epochs 400 \
                                                  --lr 0.01 \
-                                                 --weight_decay 0.0002            \
-                                                 --crop_scale 0.4 1.              \
-                                                 --crop_ratio 1. 1.               \
+                                                 --weight_decay 0.0001            \             \
                                                  --optimizer sgd                  \
                                                  --augment                        \
                                                  --mode finetune                  \
