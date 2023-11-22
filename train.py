@@ -8,6 +8,9 @@ import wandb
 from torch.nn import CrossEntropyLoss
 from tqdm import tqdm
 
+from torchvision import datasets
+from torchvision import transforms
+
 from models import get_architecture
 from data_utils.data_stats import *
 from data_utils.dataloader import get_loader
@@ -16,7 +19,7 @@ from utils.get_compute import get_compute
 from utils.metrics import topk_acc, real_acc, AverageMeter
 from utils.optimizer import get_optimizer, get_scheduler, OPTIMIZERS_DICT, SCHEDULERS
 from utils.parsers import get_training_parser
-
+import matplotlib.pyplot as plt
 
 def train(model, opt, scheduler, loss_fn, epoch, train_loader, device, args):
     start = time.time()
@@ -28,6 +31,14 @@ def train(model, opt, scheduler, loss_fn, epoch, train_loader, device, args):
     for step, (ims, targs) in enumerate(tqdm(train_loader, desc="Training epoch: " + str(epoch))):
         targs = targs.to(device)
         ims = ims.to(device)
+
+        # print images for debugging
+        # idx = 20
+        # test_img = ims[idx].clone().detach()
+        # test_img = transforms.Normalize(torch.mean(ims[idx]), torch.std(ims[idx]))(test_img)
+        # plt.imshow(test_img[2])
+        # plt.show()
+
         ims = torch.reshape(ims, (ims.shape[0], -1))
         preds = model(ims)
 
