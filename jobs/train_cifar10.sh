@@ -1,13 +1,13 @@
 #!/usr/bin/bash
 #SBATCH -A deep_learning
-#SBATCH -n 3
+#SBATCH -n 2
 #SBATCH -t 120
 #SBATCH -G 1
 #SBATCH --mem-per-cpu=2048
 #SBATCH --tmp=2048
 #SBATCH --job-name=dl-finetune
-#SBATCH --output=finetune_cifar10.out
-#SBATCH --error=finetune_cifar10.err
+#SBATCH --output=train_cifar10.out
+#SBATCH --error=train_cifar10.err
 #SBATCH --open-mode=truncate
 #SBATCH --mail-user=danieron@student.ethz.ch
 #SBATCH --mail-type=ALL
