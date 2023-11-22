@@ -18,6 +18,8 @@ from utils.get_compute import get_compute
 from utils.metrics import topk_acc, real_acc, AverageMeter
 from utils.optimizer import get_optimizer, get_scheduler
 from utils.parsers import get_training_parser
+
+
 # import matplotlib.pyplot as plt
 
 
@@ -184,6 +186,7 @@ def main(args):
 
     loss_fn = CrossEntropyLoss(label_smoothing=args.smooth).to(device)
 
+    print("wandb", args.wandb)
     if args.wandb:
         # Add your wandb credentials and project name
         wandb.init(
@@ -254,8 +257,5 @@ if __name__ == "__main__":
 
     if args.crop_resolution is None:
         args.crop_resolution = args.resolution
-    if args.wandb_entity is None:
-        print("No wandb entity provided, Continuing without wandb")
-        args.wandb = False
 
     main(args)
