@@ -47,7 +47,6 @@ def get_loader_torch(
         transforms.Normalize(mean, std),
     ]
 
-
     if augment:
         transforms_list += [
             transforms.RandomResizedCrop((crop_resolution, crop_resolution), scale=crop_scale, ratio=crop_ratio, antialias=True),

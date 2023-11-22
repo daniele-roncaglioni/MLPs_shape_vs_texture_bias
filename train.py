@@ -14,12 +14,12 @@ from torchvision import transforms
 from models import get_architecture
 from data_utils.data_stats import *
 from data_utils.dataloader import get_loader
-from utils.config import config_to_name
 from utils.get_compute import get_compute
 from utils.metrics import topk_acc, real_acc, AverageMeter
-from utils.optimizer import get_optimizer, get_scheduler, OPTIMIZERS_DICT, SCHEDULERS
+from utils.optimizer import get_optimizer, get_scheduler
 from utils.parsers import get_training_parser
 import matplotlib.pyplot as plt
+
 
 def train(model, opt, scheduler, loss_fn, epoch, train_loader, device, args):
     start = time.time()
