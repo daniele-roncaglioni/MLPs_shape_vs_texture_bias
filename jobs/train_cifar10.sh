@@ -11,8 +11,7 @@
 #SBATCH --open-mode=truncate
 #SBATCH --mail-user=danieron@student.ethz.ch
 #SBATCH --mail-type=ALL
-conda activate ds-project
-python3 "${HOME}/scaling_mlps_mirror/train.py" --architecture B_6-Wi_512 \
+"${HOME}/miniconda3/envs/ds-project/bin/python3" "${HOME}/scaling_mlps_mirror/train.py" --architecture B_6-Wi_512 \
                                                  --dataset cifar10 \
                                                  --data_resolution 32 \
                                                  --crop_resolution 32 \

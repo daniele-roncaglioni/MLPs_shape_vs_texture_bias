@@ -1,6 +1,6 @@
 #!/usr/bin/bash
 #SBATCH -A deep_learning
-#SBATCH -n 3
+#SBATCH -n 2
 #SBATCH -t 440
 #SBATCH -G 1
 #SBATCH --mem-per-cpu=2048
@@ -11,8 +11,7 @@
 #SBATCH --open-mode=truncate
 #SBATCH --mail-user=danieron@student.ethz.ch
 #SBATCH --mail-type=ALL
-conda activate ds-project
-python3 "${HOME}/scaling_mlps_mirror/finetune.py" --architecture B_6-Wi_512 \
+"${HOME}/miniconda3/envs/ds-project/bin/python3" "${HOME}/scaling_mlps_mirror/finetune.py" --architecture B_6-Wi_512 \
                                                  --checkpoint res_64_in21k \
                                                  --dataset cifar10 \
                                                  --data_resolution 32 \
