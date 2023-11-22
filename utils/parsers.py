@@ -172,7 +172,7 @@ def get_training_parser():
     )
     parser.add_argument(
         "--wandb",
-        default=False,
+        default=True,
         action=argparse.BooleanOptionalAction,
         help="Whether to log with wandb",
     )
@@ -298,7 +298,7 @@ def get_finetune_parser():
     )
     parser.add_argument(
         "--wandb",
-        default=False,
+        default=True,
         action=argparse.BooleanOptionalAction,
         help="Whether to log with wandb",
     )

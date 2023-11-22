@@ -11,6 +11,7 @@
 #SBATCH --open-mode=truncate
 #SBATCH --mail-user=danieron@student.ethz.ch
 #SBATCH --mail-type=ALL
+"${HOME}/miniconda3/envs/ds-project/bin/wandb" login
 "${HOME}/miniconda3/envs/ds-project/bin/python3" "${HOME}/scaling_mlps_mirror/train.py" --architecture B_6-Wi_512 \
                                                  --dataset cifar10 \
                                                  --data_resolution 32 \
@@ -19,7 +20,7 @@
                                                  --epochs 200 \
                                                  --save_freq 20 \
                                                  --lr 0.01 \
-                                                 --weight_decay 0.0001            \             \
+                                                 --weight_decay 0.0001            \
                                                  --optimizer sgd                  \
                                                  --augment                        \
                                                  --smooth 0.3                     \
