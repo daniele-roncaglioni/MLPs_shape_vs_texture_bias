@@ -194,6 +194,16 @@ def get_training_parser():
 
     return parser
 
+def get_stylize_parser():
+    parser = argparse.ArgumentParser(description='Preprocess ImageNet to create Stylized-ImageNet')
+    parser.add_argument('--workers', default=4, type=int, metavar='N',
+                        help='number of data loading workers (default: 4)')
+    parser.add_argument('--batch-size', default=256, type=int,
+                        metavar='N', help='mini-batch size (default: 256)')
+    parser.add_argument('--print-freq', '-p', default=1, type=int,
+                        metavar='N', help='print frequency (default: 10)')
+
+
 
 def get_finetune_parser():
     parser = argparse.ArgumentParser(description="Scaling MLPs")

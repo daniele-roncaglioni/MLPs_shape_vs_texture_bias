@@ -22,6 +22,12 @@ from PIL import Image
 
 import general as g
 import adain
+from pathlib import Path
+
+#parent_dir = os.path.abspath('..\..')
+#sys.path.append(parent_dir)
+#from parent_dir/utils import get_stylize_parser
+from utils.parsers import get_stylize_parser
 
 #####################################################################
 # purpose of this file:
@@ -29,18 +35,25 @@ import adain
 # transfer to speed-up later training.
 #####################################################################
 
-parser = argparse.ArgumentParser(description='Preprocess ImageNet to create Stylized-ImageNet')
-parser.add_argument('--workers', default=4, type=int, metavar='N',
-                    help='number of data loading workers (default: 4)')
-parser.add_argument('--batch-size', default=256, type=int,
-                    metavar='N', help='mini-batch size (default: 256)')
-parser.add_argument('--print-freq', '-p', default=1, type=int,
-                    metavar='N', help='print frequency (default: 10)')
 
 
-def main():
-    global args
-    args = parser.parse_args()
+
+def stylize_cifar(args):
+    if args.dataset == 'cifar10':
+        dataset = datasets.CIFAR10(root=f'{Path(__file__).parent}/data', train=1,
+                                            download=True)
+        foldername = 'cifar10_stylized'
+    elif args.dataset == 'cifar100':
+        dataset = datasets.CIFAR10(root=f'{Path(__file__).parent}/data', train=1,
+                                            download=True)
+        foldername = 'cifar100_stylized'
+    else:
+        raise ValueError('dataset must be either cifar10 or cifar100')
+
+    trg_path = f'{Path(__file__).parent}/student_project/data/{foldername}'
+    dataloader = torch.utils.data.DataLoader(data, batch_size=args.batch_size, shuffle=True, num_workers=2, collate_fn=collate_fn)
+
+def main(args):
 
     # Data loading code
     traindir = os.path.join(g.IMAGENET_PATH, 'train')
@@ -208,4 +221,7 @@ def preprocess(data_loader, sourcedir, targetdir,
 
 
 if __name__ == '__main__':
-    main()
+    parser = get_stylize_parser()
+    args = parser.parse_args()
+    stylize_cifar(args)
+    #main()
