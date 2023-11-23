@@ -43,7 +43,7 @@ def get_loader_torch(
     transforms_list = [
         transforms.ToTensor(),
         transforms.ConvertImageDtype(torch.float32),
-        transforms.Resize(size=(64, 64), antialias=True),
+        transforms.Resize(size=(data_resolution, data_resolution), antialias=True),
         transforms.Normalize(mean, std),
     ]
 
