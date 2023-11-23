@@ -21,7 +21,7 @@
                                                  --save_freq 20 \
                                                  --lr 0.01 \
                                                  --weight_decay 0.0001            \
-                                                 --optimizer sgd                  \
+                                                 --optimizer lion                  \
                                                  --augment                        \
                                                  --smooth 0.3                     \
                                                  --wandb                          \

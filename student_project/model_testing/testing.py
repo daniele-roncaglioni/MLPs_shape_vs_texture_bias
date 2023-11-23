@@ -34,6 +34,7 @@ def plot_batch_predictions(model, loader, dataset, classes):
     # print labels
     print('Ground truth: ', ' '.join(f'{classes[targ.item()]:5s}' for targ in targs))
     print('Predicted   : ', ' '.join(f'{classes[torch.argmax(pred).item()]:5s}' for pred in preds))
+    return targs, preds
 
 
 @torch.no_grad()
@@ -68,7 +69,7 @@ def get_test_artifacts(model_config, dataset, bs):
     model.load_device = device
     model.load_override(model_config['checkpoint_path'])
 
-    test_loader = get_loader(dataset, crop_resolution=model_config['net_input_res'], bs=bs, mode='test', augment=False, dev=device)
+    test_loader = get_loader(dataset, data_resolution=model_config['net_input_res'], crop_resolution=model_config['net_input_res'], bs=bs, mode='test', augment=False, dev=device)
     return model, test_loader
 
 
