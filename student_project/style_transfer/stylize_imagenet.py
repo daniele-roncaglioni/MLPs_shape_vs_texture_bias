@@ -40,25 +40,30 @@ from utils.parsers import get_stylize_parser
 
 def stylize_cifar(args):
     if args.dataset == 'cifar10':
-        dataset = datasets.CIFAR10(root=f'{Path(__file__).parent}/data', train=1,
-                                            download=True)
+        dataset = datasets.CIFAR10(root='../../data_utils/data', train=1,
+                                            download=True, transform=transforms.ToTensor())
         foldername = 'cifar10_stylized'
     elif args.dataset == 'cifar100':
         dataset = datasets.CIFAR10(root=f'{Path(__file__).parent}/data', train=1,
-                                            download=True)
+                                            download=True, transform=transforms.ToTensor())
         foldername = 'cifar100_stylized'
     else:
         raise ValueError('dataset must be either cifar10 or cifar100')
 
-    trg_path = f'{Path(__file__).parent}/student_project/data/{foldername}'
-    dataloader = torch.utils.data.DataLoader(data, batch_size=args.batch_size, shuffle=True, num_workers=2, collate_fn=collate_fn)
+    mode = args.mode
 
-def main(args):
+    trg_path = f'{Path(__file__).parent.parent}/data/{foldername}/{mode}/'
+    dataloader = torch.utils.data.DataLoader(dataset, batch_size=args.batch_size, shuffle=False)
 
-    # Data loading code
-    traindir = os.path.join(g.IMAGENET_PATH, 'train')
-    valdir = os.path.join(g.IMAGENET_PATH, 'val')
+    style_transfer = get_style_loader()
 
+    process_TorchDataloader(dataloader, trg_path, input_transforms=[style_transfer])
+
+
+
+
+
+def get_style_loader():
     #############################################################
     #         START STYLE TRANSFER SETUP
     #############################################################
@@ -84,6 +89,16 @@ def main(args):
 
     style_transfer = style_loader.get_style_tensor_function
     print("=> Succesfully created style loader.")
+    return style_transfer
+
+
+def main(args):
+
+    # Data loading code
+    traindir = os.path.join(g.IMAGENET_PATH, 'train')
+    valdir = os.path.join(g.IMAGENET_PATH, 'val')
+
+    style_transfer = get_style_loader()
 
     #############################################################
     #         CREATING DATA LOADERS
@@ -144,6 +159,24 @@ def main(args):
                sourcedir=traindir,
                targetdir=os.path.join(g.STYLIZED_IMAGENET_PATH, "train/"))
 
+def process_TorchDataloader(data_loader, targetdir, input_transforms=None):
+    cnter = 0
+    for i, (input, target) in enumerate(data_loader):
+        # apply manipulations
+        for transform in input_transforms:
+            input = transform(input)
+        for img_index in range(input.size()[0]):
+            trg_classdir = os.path.join(targetdir, str(target[img_index].item()))
+
+            if not os.path.exists(trg_classdir):
+                os.makedirs(trg_classdir)
+            target_img_path = os.path.join(trg_classdir,
+                                           f'{target[img_index].item()}_{cnter}.png')
+
+            save_image(tensor=input[img_index, :, :, :],
+                       fp=target_img_path)
+
+            cnter += 1
 
 def preprocess(data_loader, sourcedir, targetdir,
                input_transforms=None):

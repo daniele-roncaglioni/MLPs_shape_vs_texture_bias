@@ -93,7 +93,12 @@ class StyleLoader():
                  style_image = style_image.convert("RGB")
                  style_image = crop_square_and_downsample(style_image, (g.IMG_SIZE, g.IMG_SIZE))
 
-            output_tensor[i,:,:,:] = transforms.Compose([transforms.ToTensor()])(style_image)
+            # !!! ADDED BY TRISTAN !!!!
+            style_tensor = transforms.Compose([transforms.ToTensor()])(style_image)
+            if style_tensor.size()[-1] != tensor_size[-1]:
+                style_tensor = transforms.Compose([transforms.Resize((tensor_size[-2], tensor_size[-1]))])(style_tensor)
+
+            output_tensor[i,:,:,:] = style_tensor
 
         if torch.cuda.is_available():
             output_tensor = output_tensor.cuda()

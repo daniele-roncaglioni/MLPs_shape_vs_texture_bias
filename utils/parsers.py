@@ -203,7 +203,15 @@ def get_stylize_parser():
     parser.add_argument('--print-freq', '-p', default=1, type=int,
                         metavar='N', help='print frequency (default: 10)')
 
-
+    parser.add_argument("--dataset", default="cifar10", type=str, help="Dataset")
+    parser.add_argument(
+        "--mode",
+        default="train",
+        type=str,
+        help="Mode",
+        choices=["train", "test"],
+    )
+    return parser
 
 def get_finetune_parser():
     parser = argparse.ArgumentParser(description="Scaling MLPs")
