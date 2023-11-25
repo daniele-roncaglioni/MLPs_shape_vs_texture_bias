@@ -193,7 +193,7 @@ def main(args):
             project=args.wandb_project,
             entity=args.wandb_entity,
             config=args.__dict__,
-            tags=["pretrain", args.dataset],
+            tags=["pretrain", args.dataset, args.architecture],
             dir=f'{Path(__file__).parent}/wandb/'
         )
         wandb.run.name = f'pretrain {args.dataset}'
