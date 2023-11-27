@@ -24,6 +24,8 @@ import general as g
 import adain
 from pathlib import Path
 
+from utils.config import style_info
+
 #parent_dir = os.path.abspath('..\..')
 #sys.path.append(parent_dir)
 #from parent_dir/utils import get_stylize_parser
@@ -93,10 +95,13 @@ def get_style_loader():
 
 
 def main(args):
-
+    assert (args.mode=='train' or args.mode=='val'), "the mode must be either train or val"
     # Data loading code
-    traindir = os.path.join(g.IMAGENET_PATH, 'train')
-    valdir = os.path.join(g.IMAGENET_PATH, 'val')
+    #traindir = os.path.join(args.dataset_source_path, 'train')
+    #valdir = os.path.join(args.dataset_source_path, 'val')
+
+    source_dir = os.path.join(args.dataset_source_path, f'{args.mode}/')
+    target_dir = os.path.join(args.dataset_target_path, f"{args.mode}/")
 
     style_transfer = get_style_loader()
 
@@ -127,18 +132,14 @@ def main(args):
 
     default_transforms = transforms.Compose([
         transforms.Resize(256),
-        transforms.CenterCrop(g.IMG_SIZE),
+        transforms.CenterCrop(args.imgsize_target),
         transforms.ToTensor()])
 
-    val_loader = MyDataLoader(root=valdir,
-                              transform=default_transforms,
-                              shuffle=False,
-                              sampler=None)
 
-    train_loader = MyDataLoader(root=traindir,
-                                transform=default_transforms,
-                                shuffle=False,
-                                sampler=None)
+    loader = MyDataLoader(root=source_dir,
+                                    transform=default_transforms,
+                                    shuffle=False,
+                                    sampler=None)
 
     print("=> Succesfully created all data loaders.")
     print("")
@@ -147,17 +148,11 @@ def main(args):
     #         PREPROCESS DATASETS
     #############################################################
 
-    print("Preprocessing validation data:")
-    #preprocess(data_loader=val_loader,
-    #           input_transforms=[style_transfer],
-    #           sourcedir=valdir,
-    #           targetdir=os.path.join(g.STYLIZED_IMAGENET_PATH, "val/"))
-
     print("Preprocessing training data:")
-    preprocess(data_loader=train_loader,
+    preprocess(data_loader=loader,
                input_transforms=[style_transfer],
-               sourcedir=traindir,
-               targetdir=os.path.join(g.STYLIZED_IMAGENET_PATH, "train/"))
+               sourcedir=source_dir,
+               targetdir=target_dir)
 
 def process_TorchDataloader(data_loader, targetdir, input_transforms=None):
     cnter = 0
@@ -200,7 +195,8 @@ def preprocess(data_loader, sourcedir, targetdir,
 
     # create list of all classes
     #    Edited by Tristan: get classes always from train set as val and test are all in one big folder
-    all_classes = sorted(os.listdir(os.path.join(g.IMAGENET_PATH, "train/")))
+    all_classes = sorted(os.listdir(sourcedir))
+    all_classes = [s for s in all_classes if s.__contains__('n')]
 
     for i, (input, target) in enumerate(data_loader.loader):
 
@@ -256,5 +252,15 @@ def preprocess(data_loader, sourcedir, targetdir,
 if __name__ == '__main__':
     parser = get_stylize_parser()
     args = parser.parse_args()
-    stylize_cifar(args)
-    #main()
+
+    dataset_source_path, dataset_target_path, imgsize_target  = style_info()
+    d = vars(args)
+    d["dataset_source_path"] = dataset_source_path[args.dataset]
+    d["dataset_target_path"] = dataset_target_path[args.dataset]
+    d["imgsize_target"] = imgsize_target[args.dataset]
+    d['mode'] = 'train'  # 'val'
+
+    if args.dataset == 'cifar10' or args.dataset == 'cifar100':
+        stylize_cifar(args)
+    else:
+        main(args)

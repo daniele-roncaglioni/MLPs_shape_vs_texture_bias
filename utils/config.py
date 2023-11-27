@@ -3,6 +3,14 @@ import json
 
 from data_utils.data_stats import CLASS_DICT
 
+def style_info():
+    dataset_source_path = {"imagenette-160": "../data/imagenette-160/",
+                           "tiny-imagenet": "../data/tiny-imagenet-200/"}
+    dataset_target_path = {"imagenette-160": "../data/imagenette-160-stylized/",
+                           "tiny-imagenet": "../data/tiny-imagenet-200-stylized/"}
+    imgsize_target =  {"imagenette-160": 160,
+                           "tiny-imagenet": 224}
+    return dataset_source_path, dataset_target_path, imgsize_target
 
 def config_to_name(args):
     return os.path.join(

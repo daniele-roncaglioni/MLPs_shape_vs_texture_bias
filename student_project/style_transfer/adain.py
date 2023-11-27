@@ -22,7 +22,6 @@ import net
 from function import adaptive_instance_normalization
 
 
-
 def crop_square_and_downsample(img, downsize_size=(g.IMG_SIZE, g.IMG_SIZE)):
     """Crop to largest center square and then downsample."""
 

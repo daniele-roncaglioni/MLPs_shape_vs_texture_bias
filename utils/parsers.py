@@ -1,7 +1,6 @@
 import argparse
 from utils.optimizer import OPTIMIZERS_DICT, SCHEDULERS
 
-
 def get_training_parser():
     parser = argparse.ArgumentParser(description="Scaling MLPs")
 
@@ -195,7 +194,8 @@ def get_training_parser():
     return parser
 
 def get_stylize_parser():
-    parser = argparse.ArgumentParser(description='Preprocess ImageNet to create Stylized-ImageNet')
+    parser = argparse.ArgumentParser(description='Preprocess image dataset to create Stylized image dataset')
+
     parser.add_argument('--workers', default=4, type=int, metavar='N',
                         help='number of data loading workers (default: 4)')
     parser.add_argument('--batch-size', default=256, type=int,
@@ -203,14 +203,9 @@ def get_stylize_parser():
     parser.add_argument('--print-freq', '-p', default=1, type=int,
                         metavar='N', help='print frequency (default: 10)')
 
-    parser.add_argument("--dataset", default="cifar10", type=str, help="Dataset")
-    parser.add_argument(
-        "--mode",
-        default="train",
-        type=str,
-        help="Mode",
-        choices=["train", "test"],
-    )
+    # CHANGE FOR EACH DATASET
+    parser.add_argument("--dataset", default="imagenette-160", type=str, help="Dataset")
+
     return parser
 
 def get_finetune_parser():
