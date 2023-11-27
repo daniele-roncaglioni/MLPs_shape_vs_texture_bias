@@ -8,18 +8,20 @@ import wandb
 from torch.nn import CrossEntropyLoss
 from tqdm import tqdm
 
-from torchvision import datasets
-from torchvision import transforms
+# from torchvision import datasets
+# from torchvision import transforms
 
 from models import get_architecture
 from data_utils.data_stats import *
 from data_utils.dataloader import get_loader
-from utils.config import config_to_name
 from utils.get_compute import get_compute
 from utils.metrics import topk_acc, real_acc, AverageMeter
-from utils.optimizer import get_optimizer, get_scheduler, OPTIMIZERS_DICT, SCHEDULERS
+from utils.optimizer import get_optimizer, get_scheduler
 from utils.parsers import get_training_parser
-import matplotlib.pyplot as plt
+
+
+# import matplotlib.pyplot as plt
+
 
 def train(model, opt, scheduler, loss_fn, epoch, train_loader, device, args):
     start = time.time()
@@ -176,7 +178,7 @@ def main(args):
             # !!! ADJUST NAME OF CHECKPOINT WHEN LOADING !!!!!
             params = torch.load(f"{Path(__file__).parent}/train_checkpoints/cifar10/epoch_40_compute_85057536000000")
             model.load_state_dict(params)
-            start_ep = 41
+            start_ep = 350
         except:
             print("No pretrained model found, training from scratch")
 
@@ -185,13 +187,14 @@ def main(args):
 
     loss_fn = CrossEntropyLoss(label_smoothing=args.smooth).to(device)
 
+    print("wandb", args.wandb)
     if args.wandb:
         # Add your wandb credentials and project name
         wandb.init(
             project=args.wandb_project,
             entity=args.wandb_entity,
             config=args.__dict__,
-            tags=["pretrain", args.dataset],
+            tags=["pretrain", args.dataset, args.architecture],
             dir=f'{Path(__file__).parent}/wandb/'
         )
         wandb.run.name = f'pretrain {args.dataset}'
@@ -255,8 +258,5 @@ if __name__ == "__main__":
 
     if args.crop_resolution is None:
         args.crop_resolution = args.resolution
-    if args.wandb_entity is None:
-        print("No wandb entity provided, Continuing without wandb")
-        args.wandb = False
 
     main(args)
