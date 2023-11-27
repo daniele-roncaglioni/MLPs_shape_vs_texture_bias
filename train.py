@@ -18,6 +18,10 @@ from utils.get_compute import get_compute
 from utils.metrics import topk_acc, real_acc, AverageMeter
 from utils.optimizer import get_optimizer, get_scheduler
 from utils.parsers import get_training_parser
+from datetime import datetime
+
+now = datetime.now()
+timestamp = now.strftime("%d-%m-%y, %H:%M")
 
 
 # import matplotlib.pyplot as plt
@@ -193,10 +197,10 @@ def main(args):
             project=args.wandb_project,
             entity=args.wandb_entity,
             config=args.__dict__,
-            tags=["pretrain", args.dataset, args.architecture],
+            tags=["pretrain", timestamp, args.dataset, args.architecture, args.lr, args.weight_decay, args.optimizer],
             dir=f'{Path(__file__).parent}/wandb/'
         )
-        wandb.run.name = f'pretrain {args.dataset}'
+        wandb.run.name = f'pretrain {args.dataset} {args.architecture}'
 
     compute_per_epoch = get_compute(model, args.n_train, args.crop_resolution, device)
 
