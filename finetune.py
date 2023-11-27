@@ -157,10 +157,10 @@ def finetune(args):
             project=args.wandb_project,
             entity=args.wandb_entity,
             config=args.__dict__,
-            tags=[f" {timestamp} finetune", args.dataset],
+            tags=["finetune", timestamp, args.checkpoint, args.dataset, args.architecture, args.lr, args.weight_decay, args.optimizer],
             dir=f'{Path(__file__).parent}/wandb/'
         )
-        wandb.run.name = f'finetune {args.dataset}'
+        wandb.run.name = f'finetune {args.dataset} {args.architecture}'
 
     for ep in range(args.epochs):
         train_acc, train_top5, train_loss, train_time = train(
