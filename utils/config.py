@@ -10,7 +10,9 @@ def style_info():
                            "tiny-imagenet": "../data/tiny-imagenet-200-stylized/"}
     imgsize_target =  {"imagenette-160": 160,
                            "tiny-imagenet": 224}
-    return dataset_source_path, dataset_target_path, imgsize_target
+    resize = {"imagenette-160": False,
+                           "tiny-imagenet": True}
+    return dataset_source_path, dataset_target_path, imgsize_target, resize
 
 def config_to_name(args):
     return os.path.join(

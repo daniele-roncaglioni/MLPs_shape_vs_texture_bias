@@ -129,11 +129,11 @@ def main(args):
                 sampler=sampler,
                 num_workers=num_workers,
                 pin_memory=True)
-
-    default_transforms = transforms.Compose([
-        transforms.Resize(256),
+    transform_list = [transforms.Resize(256)(x)] if args.resize else []
+    transform_list.extend([
         transforms.CenterCrop(args.imgsize_target),
         transforms.ToTensor()])
+    default_transforms = transforms.Compose(transform_list)
 
 
     loader = MyDataLoader(root=source_dir,
@@ -253,12 +253,14 @@ if __name__ == '__main__':
     parser = get_stylize_parser()
     args = parser.parse_args()
 
-    dataset_source_path, dataset_target_path, imgsize_target  = style_info()
+    dataset_source_path, dataset_target_path, imgsize_target, resize = style_info()
     d = vars(args)
     d["dataset_source_path"] = dataset_source_path[args.dataset]
     d["dataset_target_path"] = dataset_target_path[args.dataset]
     d["imgsize_target"] = imgsize_target[args.dataset]
-    d['mode'] = 'train'  # 'val'
+    d['resize'] = resize[args.dataset]
+    d['mode'] = 'val'  # 'val'
+
 
     if args.dataset == 'cifar10' or args.dataset == 'cifar100':
         stylize_cifar(args)
