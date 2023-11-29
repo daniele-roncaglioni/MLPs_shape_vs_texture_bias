@@ -198,7 +198,7 @@ def main(args):
             project=args.wandb_project,
             entity=args.wandb_entity,
             config=args.__dict__,
-            tags=["pretrain", timestamp, args.dataset, args.architecture, args.lr, args.weight_decay, args.optimizer],
+            tags=["pretrain", timestamp, args.dataset, args.architecture, str(args.lr), str(args.weight_decay), args.optimizer],
             dir=f'{Path(__file__).parent}/wandb/'
         )
         wandb.run.name = f'pretrain {args.dataset} {args.architecture}'
