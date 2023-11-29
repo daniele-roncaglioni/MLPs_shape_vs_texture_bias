@@ -43,7 +43,8 @@ def get_loader_torch(
     transforms_list = [
         transforms.ToTensor(),
         transforms.ConvertImageDtype(torch.float32),
-        transforms.Resize(size=(data_resolution, data_resolution), antialias=True),
+        transforms.CenterCrop(size=data_resolution),
+        transforms.Resize(size=(crop_resolution, crop_resolution), antialias=True),
         transforms.Normalize(mean, std),
     ]
 
@@ -62,6 +63,14 @@ def get_loader_torch(
     elif dataset == 'cifar100':
         data = torchvision.datasets.CIFAR100(root=f'{Path(__file__).parent}/data', train=mode == 'train',
                                              download=True, transform=transforms_pipeline)
+    elif dataset == 'imagenette-160':
+        data = torchvision.datasets.ImageFolder(root=f'{Path(__file__).parent}/data/imagenette-160/{mode}',
+                                                transform=transforms_pipeline)
+        if mode == 'test':
+            # keep most for validation and small part for real test
+            generator = torch.Generator().manual_seed(42)
+            [val, test] = torch.utils.data.random_split(data, [0.9, 0.1], generator=generator)
+            data = val
     else:
         raise ValueError
 

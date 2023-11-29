@@ -13,7 +13,7 @@ def get_training_parser():
     )
     parser.add_argument(
         "--dataset",
-        default="imagenet21",
+        default="imagenette-160",
         type=str,
         help="Dataset"
     )
@@ -187,9 +187,9 @@ def get_training_parser():
         type=str,
         help="Wandb entity name"
     )
-    parser.add_argument('--crop_scale', nargs='+', type=float, default=[0.4, 1.], help="Scale for crop at test time")
+    parser.add_argument('--crop_scale', nargs='+', type=float, default=[0.8, 1.], help="Scale for crop at test time")
     parser.add_argument('--crop_ratio', nargs='+', type=float, default=[1., 1.], help="Ratio for crop at test time")
-    parser.add_argument("--data_resolution", default=64, type=int, help="Image Resolution")
+    # parser.add_argument("--data_resolution", default=64, type=int, help="Image Resolution")
 
     return parser
 

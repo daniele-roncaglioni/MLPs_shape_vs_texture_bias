@@ -6,6 +6,7 @@ import numpy as np
 SAMPLE_DICT = {
     "imagenet21": 11801680,
     "imagenet": 1281167,
+    "imagenette-160": 9469,
     "imagenet_real": 1281167,
     "tinyimagenet": 100000,
     "cifar10": 50000,
@@ -17,7 +18,8 @@ SAMPLE_DICT = {
 CLASS_DICT = {
     "imagenet21": 11230,
     "in21k": 11230,         # Need the short name here too for loading models
-    "imagenet": 1000,   
+    "imagenet": 1000,
+    "imagenette-160": 10,
     "in1k": 1000,           # Need the short name here too for loading models
     'imagenet_real': 1000,
     "tinyimagenet": 200,
@@ -30,6 +32,7 @@ CLASS_DICT = {
 DEFAULT_RES_DICT = {
     "imagenet21": 64,
     "imagenet": 64,
+    "imagenette-160": 160,
     "imagenet_real": 64,
     "tinyimagenet": 64,
     "cifar10": 32,
@@ -42,6 +45,7 @@ DEFAULT_RES_DICT = {
 DATA_DICT = {
     "imagenet21": "imagenet21",
     "imagenet": "imagenet",
+    "imagenette-160": "imagenette-160",
     "tinyimagenet": "tiny-imagenet-200",
     "imagenet_real": "imagenet",
     "cifar10": "cifar10",
@@ -52,6 +56,7 @@ DATA_DICT = {
 MODE_DICT = {
     "imagenet21": "test",
     "imagenet": "val",
+    "imagenette-160": "test",
     'imagenet_real': "val",
     "tinyimagenet": "val",
     "cifar10": "val",
@@ -63,6 +68,7 @@ MODE_DICT = {
 MEAN_DICT = {
     "imagenet21": np.array([0.485, 0.456, 0.406]) * 255,
     "imagenet": np.array([0.485, 0.456, 0.406]) * 255,
+    "imagenette-160": np.array([0.467, 0.459, 0.43]),
     "imagenet_real": np.array([0.485, 0.456, 0.406]) * 255,
     "tinyimagenet": np.array([0.485, 0.456, 0.406]),
     "cifar10": np.array([0.49139968, 0.48215827, 0.44653124]),
@@ -74,6 +80,7 @@ MEAN_DICT = {
 STD_DICT = {
     "imagenet21": np.array([0.229, 0.224, 0.225]) * 255,
     "imagenet": np.array([0.229, 0.224, 0.225]) * 255,
+    "imagenette-160": np.array([0.2793, 0.2759, 0.2976]),
     "imagenet_real": np.array([0.229, 0.224, 0.225]) * 255,
     "tinyimagenet": np.array([0.229, 0.224, 0.225]),
     "cifar10": np.array([0.24703233, 0.24348505, 0.26158768]),
@@ -85,6 +92,7 @@ STD_DICT = {
 OS_CACHED_DICT = {
     "imagenet21": False,
     "imagenet": False,
+    "imagenette-160": False,
     "imagenet_real": False,
     "tinyimagenet": True,
     "cifar10": True,
