@@ -258,7 +258,7 @@ if __name__ == '__main__':
     d["dataset_source_path"] = dataset_source_path[args.dataset]
     d["dataset_target_path"] = dataset_target_path[args.dataset]
     d["imgsize_target"] = imgsize_target[args.dataset]
-    d['resize'] = resize[args.dataset]
+    d['resize'] = resize[args.dataset] # resize image to 256 before cropping as in the original implementation?
     d['mode'] = 'val'  # 'val'
 
 
