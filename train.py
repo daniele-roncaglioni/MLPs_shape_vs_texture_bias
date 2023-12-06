@@ -182,7 +182,7 @@ def main(args):
             # !!! ADJUST NAME OF CHECKPOINT WHEN LOADING !!!!!
             params = torch.load(args.reload)
             model.load_state_dict(params)
-            start_ep = 350
+            start_ep = int(args.reload.split("_")[1])
             print(f"Reloaded {args.reload}, epoch: {start_ep}")
         except:
             print("No pretrained model found, training from scratch")
