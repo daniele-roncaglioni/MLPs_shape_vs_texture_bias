@@ -11,8 +11,8 @@
 #SBATCH --open-mode=truncate
 #SBATCH --mail-user=danieron@student.ethz.ch
 #SBATCH --mail-type=ALL
-"${HOME}/miniconda3/envs/ds-project/bin/wandb" login
-"${HOME}/miniconda3/envs/ds-project/bin/python3" "${HOME}/scaling_mlps_mirror/train.py" --architecture B_6-Wi_512 \
+"${HOME}/scaling_mlps_mirror/.ds-venv/bin/wandb" login
+"${HOME}/scaling_mlps_mirror/.ds-venv/bin/python" "${HOME}/scaling_mlps_mirror/train.py" --architecture B_6-Wi_512 \
                                                  --dataset imagenette-160 \
                                                  --resolution 160  \
                                                  --crop_resolution 64 \
@@ -26,4 +26,5 @@
                                                  --smooth 0.3                     \
                                                  --wandb                          \
                                                  --wandb_project shape-vs-texture \
-                                                 --calculate_stats 20
+                                                 --calculate_stats 20  \
+                                                 --reload "/home/danieron/scaling_mlps_mirror/train_checkpoints/imagenette-160/epoch_160_compute_85879351541760"

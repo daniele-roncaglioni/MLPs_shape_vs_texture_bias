@@ -180,9 +180,10 @@ def main(args):
     if args.reload:
         try:
             # !!! ADJUST NAME OF CHECKPOINT WHEN LOADING !!!!!
-            params = torch.load(f"{Path(__file__).parent}/train_checkpoints/cifar10/epoch_40_compute_85057536000000")
+            params = torch.load(args.reload)
             model.load_state_dict(params)
             start_ep = 350
+            print(f"Reloaded {args.reload}, epoch: {start_ep}")
         except:
             print("No pretrained model found, training from scratch")
 

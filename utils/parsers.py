@@ -127,8 +127,8 @@ def get_training_parser():
     )
     parser.add_argument(
         "--reload",
-        action=argparse.BooleanOptionalAction,
-        default=False,
+        type=str,
+        default=None,
         help="Reinitialize from checkpoint",
     )
     parser.add_argument(
