@@ -239,7 +239,7 @@ def main(args):
         )
 
         if args.wandb:
-            wandb.log({"Training time": train_time, "Training loss": train_loss})
+            wandb.log({"Training time": train_time, "Training loss": train_loss}, ep)
 
         if ep % args.save_freq == 0 and args.save:
             torch.save(
@@ -260,7 +260,8 @@ def main(args):
                         "Test Top 5 accuracy": test_top5,
                         "Test loss": test_loss,
                         "Inference time": test_time,
-                    }
+                    },
+                    ep
                 )
 
             # Print all the stats
