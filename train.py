@@ -208,7 +208,8 @@ def main(args):
                 model.load_state_dict(params)
                 checkpoint_data = parse_checkpoint(args.reload.split("/")[-1])
                 start_ep = int(checkpoint_data['epoch'])
-                print(f"Reloaded {args.reload}, epoch: {start_ep}")
+                args.epochs = args.epochs + start_ep
+                print(f"Reloaded {args.reload}, start epoch: {start_ep}")
             except:
                 raise "No pretrained model found"
             wandb.init(
