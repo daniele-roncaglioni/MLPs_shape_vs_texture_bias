@@ -71,6 +71,14 @@ def get_loader_torch(
             generator = torch.Generator().manual_seed(42)
             [val, test] = torch.utils.data.random_split(data, [0.9, 0.1], generator=generator)
             data = val
+    elif dataset == 'imagenette-160-stylized':
+        data = torchvision.datasets.ImageFolder(root=f'{Path(__file__).parent}/data/imagenette-160-stylized/{mode}',
+                                                transform=transforms_pipeline)
+        if mode == 'test':
+            # keep most for validation and small part for real test
+            generator = torch.Generator().manual_seed(42)
+            [val, test] = torch.utils.data.random_split(data, [0.9, 0.1], generator=generator)
+            data = val
     else:
         raise ValueError
 

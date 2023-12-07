@@ -187,7 +187,7 @@ def main(args):
         crop_resolution=args.crop_resolution
     )
 
-    start_ep = 1
+    start_ep = 0
     opt = get_optimizer(args.optimizer)(model.parameters(), lr=args.lr, weight_decay=args.weight_decay)
     scheduler = get_scheduler(opt, args.scheduler, **args.__dict__)
 
@@ -229,7 +229,7 @@ def main(args):
     compute_per_epoch = get_compute(model, args.n_train, args.crop_resolution, device)
 
     for ep in range(start_ep, args.epochs):
-        calc_stats = (ep + 1) % args.calculate_stats == 0
+        calc_stats = ((ep + 1) % args.calculate_stats == 0) or (ep == 0)
 
         current_compute = compute_per_epoch * ep
 
