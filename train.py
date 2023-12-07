@@ -206,7 +206,7 @@ def main(args):
             try:
                 params = torch.load(args.reload)
                 model.load_state_dict(params)
-                checkpoint_data = parse_checkpoint(args.reload)
+                checkpoint_data = parse_checkpoint(args.reload.split("/")[-1])
                 start_ep = int(checkpoint_data['epoch'])
                 print(f"Reloaded {args.reload}, epoch: {start_ep}")
             except:
