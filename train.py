@@ -26,6 +26,17 @@ timestamp = now.strftime("%d-%m-%y, %H:%M")
 
 # import matplotlib.pyplot as plt
 
+def parse_checkpoint(path):
+    split_checkpoint_path = path.split("__")
+    checkpoint_data = {}
+    for item_str in split_checkpoint_path:
+        try:
+            item = item_str.split("_")
+            checkpoint_data[item[0]] = item[1]
+        except:
+            pass
+    return checkpoint_data
+
 
 def train(model, opt, scheduler, loss_fn, epoch, train_loader, device, args):
     start = time.time()
@@ -177,16 +188,6 @@ def main(args):
     )
 
     start_ep = 1
-    if args.reload:
-        try:
-            # !!! ADJUST NAME OF CHECKPOINT WHEN LOADING !!!!!
-            params = torch.load(args.reload)
-            model.load_state_dict(params)
-            start_ep = int(args.reload.split("_")[1])
-            print(f"Reloaded {args.reload}, epoch: {start_ep}")
-        except:
-            print("No pretrained model found, training from scratch")
-
     opt = get_optimizer(args.optimizer)(model.parameters(), lr=args.lr, weight_decay=args.weight_decay)
     scheduler = get_scheduler(opt, args.scheduler, **args.__dict__)
 
@@ -194,15 +195,36 @@ def main(args):
 
     print("wandb", args.wandb)
     if args.wandb:
-        # Add your wandb credentials and project name
-        wandb.init(
-            project=args.wandb_project,
-            entity=args.wandb_entity,
-            config=args.__dict__,
-            tags=["pretrain", timestamp, args.dataset, args.architecture, str(args.lr), str(args.weight_decay), args.optimizer],
-            dir=f'{Path(__file__).parent}/wandb/'
-        )
+        common_kwargs = {
+            'project': args.wandb_project,
+            'entity': args.wandb_entity,
+            'config': args.__dict__,
+            'tags': ["pretrain", timestamp, args.dataset, args.architecture, str(args.lr), str(args.weight_decay), args.optimizer],
+            'dir': f'{Path(__file__).parent}/wandb/',
+        }
+        if args.reload:
+            try:
+                params = torch.load(args.reload)
+                model.load_state_dict(params)
+                checkpoint_data = parse_checkpoint(args.reload)
+                start_ep = int(checkpoint_data['epoch'])
+                print(f"Reloaded {args.reload}, epoch: {start_ep}")
+            except:
+                raise "No pretrained model found"
+            wandb.init(
+                **common_kwargs,
+                id=checkpoint_data['wandb'],
+                resume=True,
+            )
+        else:
+            # Add your wandb credentials and project name
+            wandb.init(
+                **common_kwargs,
+            )
         wandb.run.name = f'pretrain {args.dataset} {args.architecture}'
+        wandb_run_id = wandb.run.id
+    else:
+        wandb_run_id = 'NA'
 
     compute_per_epoch = get_compute(model, args.n_train, args.crop_resolution, device)
 
@@ -221,7 +243,7 @@ def main(args):
         if ep % args.save_freq == 0 and args.save:
             torch.save(
                 model.state_dict(),
-                path + "/epoch_" + str(ep) + "_compute_" + str(current_compute),
+                path + f"/wandb_{wandb_run_id}__epoch_{str(ep)}__compute_{str(current_compute)}__{args.architecture}__{args.dataset}"
             )
 
         if calc_stats:
