@@ -27,4 +27,5 @@
                                                  --wandb                          \
                                                  --wandb_project shape-vs-texture \
                                                  --calculate_stats 20  \
+                                                 --reload "/home/gtristan/scaling_mlps_mirror/train_checkpoints/imagenette-160-stylized/epoch_120_compute_64409513656320"
                                    

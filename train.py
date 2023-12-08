@@ -204,7 +204,7 @@ def main(args):
         }
         if args.reload:
             try:
-                params = torch.load(args.reload)
+                params = torch.load(args.reload) #, map_location=torch.device(device))
                 model.load_state_dict(params)
                 checkpoint_data = parse_checkpoint(args.reload.split("/")[-1])
                 start_ep = int(checkpoint_data['epoch'])
