@@ -59,22 +59,24 @@ def train(model, opt, scheduler, loss_fn, epoch, train_loader, device, args):
         ims = torch.reshape(ims, (ims.shape[0], -1))
         preds = model(ims)
 
-        if args.mixup > 0:
-            targs_perm = targs[:, 1].long()
-            weight = targs[0, 2].squeeze()
-            targs = targs[:, 0].long()
-            if weight != -1:
-                loss = loss_fn(preds, targs) * weight + loss_fn(preds, targs_perm) * (
-                        1 - weight
-                )
-            else:
-                loss = loss_fn(preds, targs)
-                targs_perm = None
-        else:
-            loss = loss_fn(preds, targs)
-            targs_perm = None
+        # if args.mixup > 0:
+        #     targs_perm = targs[:, 1].long()
+        #     weight = targs[0, 2].squeeze()
+        #     targs = targs[:, 0].long()
+        #     if weight != -1:
+        #         loss = loss_fn(preds, targs) * weight + loss_fn(preds, targs_perm) * (
+        #                 1 - weight
+        #         )
+        #     else:
+        #         loss = loss_fn(preds, targs)
+        #         targs_perm = None
+        # else:
+        #     loss = loss_fn(preds, targs)
+        #     targs_perm = None
+        loss = loss_fn(preds, targs)
+        targs_perm = None
 
-        acc, top5 = topk_acc(preds, targs, targs_perm, k=5, avg=True)
+        acc, top5 = topk_acc(preds, targs, targs_perm, k=5, avg=True, mixup=args.mixup > 0.)
         total_acc.update(acc, ims.shape[0])
         total_top5.update(top5, ims.shape[0])
 
@@ -114,7 +116,7 @@ def test(model, loader, loss_fn, device, args):
         preds = model(ims)
 
         if args.dataset != 'imagenet_real':
-            acc, top5 = topk_acc(preds, targs, k=5, avg=True)
+            acc, top5 = topk_acc(preds, targs, k=5, avg=True, mixup=False)
             loss = loss_fn(preds, targs).item()
         else:
             acc = real_acc(preds, targs, k=5, avg=True)
@@ -204,7 +206,7 @@ def main(args):
         }
         if args.reload:
             try:
-                params = torch.load(args.reload) #, map_location=torch.device(device))
+                params = torch.load(args.reload)  # , map_location=torch.device(device))
                 model.load_state_dict(params)
                 checkpoint_data = parse_checkpoint(args.reload.split("/")[-1])
                 start_ep = int(checkpoint_data['epoch'])

@@ -23,18 +23,22 @@ class AverageMeter(object):
         return self.sum / self.count if not percentage else self.sum * 100 / self.count
 
 
-def topk_acc(preds, targs, targs_perm=None, k=5, avg=False):
+def topk_acc(preds, targs, targs_perm=None, k=5, avg=False, mixup=True):
     if avg:
         num = preds.shape[0]
     else:
         num = 1
     _, top_k_inds = topk(preds, k)
-    top_5 = 1 / num * sum(any(top_k_inds == targs.unsqueeze(dim=1), dim=1), dim=0)
-    acc = 1 / num * sum(top_k_inds[:, 0].eq(targs), dim=0)
+    if mixup:
+        top_5 = torch.tensor([0])  # we don't care about top 5 because we have 10 classes only in our dataset
+        acc = 1 / num * sum(top_k_inds[:, 0].eq(torch.argmax(targs, dim=1)), dim=0)
+    else:
+        top_5 = 1 / num * sum(any(top_k_inds == targs.unsqueeze(dim=1), dim=1), dim=0)
+        acc = 1 / num * sum(top_k_inds[:, 0].eq(targs), dim=0)
 
     if targs_perm is not None:
         top_5_perm = (
-            1 / num * sum(any(top_k_inds == targs_perm.unsqueeze(dim=1), dim=1), dim=0)
+                1 / num * sum(any(top_k_inds == targs_perm.unsqueeze(dim=1), dim=1), dim=0)
         )
         acc_perm = 1 / num * sum(top_k_inds[:, 0].eq(targs_perm), dim=0)
 
