@@ -199,7 +199,7 @@ def main(args):
             'project': args.wandb_project,
             'entity': args.wandb_entity,
             'config': args.__dict__,
-            'tags': ["pretrain", timestamp, args.dataset, args.architecture, str(args.lr), str(args.weight_decay), args.optimizer, args.dropout],
+            'tags': ["pretrain", timestamp, args.dataset, args.architecture, str(args.lr), str(args.weight_decay), args.optimizer, str(args.dropout)],
             'dir': f'{Path(__file__).parent}/wandb/',
         }
         if args.reload:
