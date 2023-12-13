@@ -62,8 +62,8 @@ def get_training_parser():
         help="Normalization type"
     )
     parser.add_argument(
-        "--drop_rate",
-        default=None,
+        "--dropout",
+        default=0.0,
         type=float,
         help="Drop rate for dropout"
     )

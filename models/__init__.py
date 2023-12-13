@@ -9,7 +9,7 @@ def get_architecture(
     num_classes=None,
     normalization='layer',
     act='gelu',
-    drop_rate=None,
+    dropout=0.0,
     **kwargs,
 ):
     assert model in ["BottleneckMLP", "MLP"], f"Model {model} not supported."
@@ -32,7 +32,7 @@ def get_architecture(
             block_dims=blocks,
             norm=normalization,
             # act=act,
-            # drop_rate=drop_rate
+            dropout=dropout
         )
 
     elif model == "MLP":

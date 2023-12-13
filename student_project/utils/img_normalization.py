@@ -37,5 +37,5 @@ if __name__ == '__main__':
         args.crop_resolution = args.resolution
 
     mode = 'train'
-    dataset = datasets.ImageFolder(root=f'../../data_utils/data/imagenette-160/{mode}')
+    dataset = datasets.ImageFolder(root=f'../../data_utils/data/imagenette-160-stylized/{mode}')
     calc_stats(dataset, args)

@@ -49,7 +49,7 @@ class StandardMLP(nn.Module):
 
 
 class BottleneckMLP(nn.Module):
-    def __init__(self, dim_in, dim_out, block_dims, norm='layer', checkpoint=None, name=None, load_device='cuda:0'):
+    def __init__(self, dim_in, dim_out, block_dims, norm='layer', checkpoint=None, name=None, load_device='cuda:0', dropout=0.0):
         super(BottleneckMLP, self).__init__()
         self.dim_in = dim_in
         self.dim_out = dim_out
@@ -66,7 +66,7 @@ class BottleneckMLP(nn.Module):
 
         for block_dim in self.block_dims:
             wide, thin = block_dim
-            blocks.append(BottleneckBlock(thin=thin, wide=wide))
+            blocks.append(BottleneckBlock(thin=thin, wide=wide, dropout=dropout))
             layernorms.append(self.norm(thin))
 
         self.blocks = nn.ModuleList(blocks)
@@ -123,12 +123,17 @@ class BottleneckMLP(nn.Module):
 
 
 class BottleneckBlock(nn.Module):
-    def __init__(self, thin, wide, act=nn.GELU()):
+    def __init__(self, thin, wide, act=nn.GELU(), dropout=0.0):
         super(BottleneckBlock, self).__init__()
 
-        self.block = nn.Sequential(
-            nn.Linear(thin, wide), act, nn.Linear(wide, thin)
-        )
+        if dropout > 0.0:
+            self.block = nn.Sequential(
+                nn.Linear(thin, wide), act, nn.Dropout(dropout), nn.Linear(wide, thin), nn.Dropout(dropout)
+            )
+        else:
+            self.block = nn.Sequential(
+                nn.Linear(thin, wide), act, nn.Linear(wide, thin)
+            )
 
     def forward(self, x):
         out = self.block(x)
@@ -136,28 +141,28 @@ class BottleneckBlock(nn.Module):
         return out
 
 
-def B_12_Wi_1024(dim_in, dim_out, load_device, checkpoint=None):
+def B_12_Wi_1024(dim_in, dim_out, load_device, checkpoint=None, dropout=0.0):
     block_dims = [[4 * 1024, 1024] for _ in range(12)]
     return BottleneckMLP(dim_in=dim_in, dim_out=dim_out, norm='layer', block_dims=block_dims, checkpoint=checkpoint, load_device=load_device,
-                         name='B_' + str(len(block_dims)) + '-Wi_' + str(block_dims[0][1]) + '_res_' + str(int(np.sqrt(dim_in / 3))))
+                         name='B_' + str(len(block_dims)) + '-Wi_' + str(block_dims[0][1]) + '_res_' + str(int(np.sqrt(dim_in / 3))), dropout=dropout)
 
 
-def B_12_Wi_512(dim_in, dim_out, load_device, checkpoint=None):
+def B_12_Wi_512(dim_in, dim_out, load_device, checkpoint=None, dropout=0.0):
     block_dims = [[4 * 512, 512] for _ in range(12)]
     return BottleneckMLP(dim_in=dim_in, dim_out=dim_out, norm='layer', block_dims=block_dims, checkpoint=checkpoint, load_device=load_device,
-                         name='B_' + str(len(block_dims)) + '-Wi_' + str(block_dims[0][1]) + '_res_' + str(int(np.sqrt(dim_in / 3))))
+                         name='B_' + str(len(block_dims)) + '-Wi_' + str(block_dims[0][1]) + '_res_' + str(int(np.sqrt(dim_in / 3))), dropout=dropout)
 
 
-def B_6_Wi_1024(dim_in, dim_out, load_device, checkpoint=None):
+def B_6_Wi_1024(dim_in, dim_out, load_device, checkpoint=None, dropout=0.0):
     block_dims = [[4 * 1024, 1024] for _ in range(6)]
     return BottleneckMLP(dim_in=dim_in, dim_out=dim_out, norm='layer', block_dims=block_dims, checkpoint=checkpoint, load_device=load_device,
-                         name='B_' + str(len(block_dims)) + '-Wi_' + str(block_dims[0][1]) + '_res_' + str(int(np.sqrt(dim_in / 3))))
+                         name='B_' + str(len(block_dims)) + '-Wi_' + str(block_dims[0][1]) + '_res_' + str(int(np.sqrt(dim_in / 3))), dropout=dropout)
 
 
-def B_6_Wi_512(dim_in, dim_out, load_device, checkpoint=None):
+def B_6_Wi_512(dim_in, dim_out, load_device, checkpoint=None, dropout=0.0):
     block_dims = [[4 * 512, 512] for _ in range(6)]
     return BottleneckMLP(dim_in=dim_in, dim_out=dim_out, norm='layer', block_dims=block_dims, checkpoint=checkpoint, load_device=load_device,
-                         name='B_' + str(len(block_dims)) + '-Wi_' + str(block_dims[0][1]) + '_res_' + str(int(np.sqrt(dim_in / 3))))
+                         name='B_' + str(len(block_dims)) + '-Wi_' + str(block_dims[0][1]) + '_res_' + str(int(np.sqrt(dim_in / 3))), dropout=dropout)
 
 
 model_list = {
@@ -168,5 +173,5 @@ model_list = {
 }
 
 
-def get_model(architecture, checkpoint, resolution, num_classes, load_device):
-    return model_list[architecture](dim_in=resolution ** 2 * 3, dim_out=num_classes, load_device=load_device, checkpoint=checkpoint, )
+def get_model(architecture, checkpoint, resolution, num_classes, load_device, dropout):
+    return model_list[architecture](dim_in=resolution ** 2 * 3, dim_out=num_classes, load_device=load_device, checkpoint=checkpoint, dropout=dropout)
