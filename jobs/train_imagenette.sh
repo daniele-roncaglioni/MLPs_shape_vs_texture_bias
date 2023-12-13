@@ -27,4 +27,4 @@
                                                  --wandb                          \
                                                  --wandb_project shape-vs-texture \
                                                  --calculate_stats 20  \
-                                                 --reload "/home/danieron/scaling_mlps_mirror/train_checkpoints/imagenette-160/epoch_160_compute_85879351541760"
+                                                 --reload "${HOME}/scaling_mlps_mirror/train_checkpoints/imagenette-160/epoch_160_compute_85879351541760"
