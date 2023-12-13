@@ -199,14 +199,16 @@ def main(args):
             'project': args.wandb_project,
             'entity': args.wandb_entity,
             'config': args.__dict__,
-            'tags': ["pretrain", timestamp, args.dataset, args.architecture, str(args.lr), str(args.weight_decay), args.optimizer],
+            'tags': ["pretrain", timestamp, args.dataset, args.architecture, str(args.lr), str(args.weight_decay), args.optimizer, args.dropout],
             'dir': f'{Path(__file__).parent}/wandb/',
         }
         if args.reload:
             try:
                 params = torch.load(args.reload) #, map_location=torch.device(device))
-                model.load_state_dict(params)
-                checkpoint_data = parse_checkpoint(args.reload.split("/")[-1])
+                model.load_state_dict(params['model'])
+                opt.load_state_dict(params['optimizer'])
+                scheduler.load_state_dict(params['lr_sched'])
+                checkpoint_data = parse_checkpoint(os.path.split(args.reload)[1]) # args.reload.split("/")[-1])
                 start_ep = int(checkpoint_data['epoch'])
                 args.epochs = args.epochs + start_ep
                 print(f"Reloaded {args.reload}, start epoch: {start_ep}")
@@ -222,7 +224,7 @@ def main(args):
             wandb.init(
                 **common_kwargs,
             )
-        wandb.run.name = f'pretrain {args.dataset} {args.architecture}'
+        wandb.run.name = f'pretrain {args.dataset} {args.architecture} {args.dropout}'
         wandb_run_id = wandb.run.id
     else:
         wandb_run_id = 'NA'
@@ -242,9 +244,13 @@ def main(args):
             wandb.log({"Training time": train_time, "Training loss": train_loss}, ep)
 
         if ep % args.save_freq == 0 and args.save:
+            checkpoint = {
+                'model': model.state_dict(),
+                'optimizer': opt.state_dict(),
+                'lr_sched': scheduler.state_dict()}
             torch.save(
-                model.state_dict(),
-                path + f"/wandb_{wandb_run_id}__epoch_{str(ep)}__compute_{str(current_compute)}__{args.architecture}__{args.dataset}"
+                checkpoint,
+                path + f"/wandb_{wandb_run_id}__epoch_{str(ep)}__compute_{str(current_compute)}__{args.architecture}__{args.dataset}__dropout_{args.dropout}"
             )
 
         if calc_stats:

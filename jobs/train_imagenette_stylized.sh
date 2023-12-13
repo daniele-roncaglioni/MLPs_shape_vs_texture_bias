@@ -27,5 +27,5 @@
                                                  --wandb                          \
                                                  --wandb_project shape-vs-texture \
                                                  --calculate_stats 20  \
-                                                 --reload "${HOME}/scaling_mlps_mirror/train_checkpoints/imagenette-160-stylized/wandb_qb73hmcg__epoch_120__compute_64409513656320__B_6-Wi_512__imagenette-160-stylized"
+                                                 #--reload "${HOME}/scaling_mlps_mirror/train_checkpoints/imagenette-160-stylized/wandb_qb73hmcg__epoch_120__compute_64409513656320__B_6-Wi_512__imagenette-160-stylized"
                                    
