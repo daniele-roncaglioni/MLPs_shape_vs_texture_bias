@@ -165,11 +165,17 @@ def B_6_Wi_512(dim_in, dim_out, load_device, checkpoint=None, dropout=0.0):
                          name='B_' + str(len(block_dims)) + '-Wi_' + str(block_dims[0][1]) + '_res_' + str(int(np.sqrt(dim_in / 3))), dropout=dropout)
 
 
+def B_3_Wi_256(dim_in, dim_out, load_device, checkpoint=None, dropout=0.0):
+    block_dims = [[4 * 256, 256] for _ in range(3)]
+    return BottleneckMLP(dim_in=dim_in, dim_out=dim_out, norm='layer', block_dims=block_dims, checkpoint=checkpoint, load_device=load_device,
+                         name='B_' + str(len(block_dims)) + '-Wi_' + str(block_dims[0][1]) + '_res_' + str(int(np.sqrt(dim_in / 3))), dropout=dropout)
+
 model_list = {
     'B_12-Wi_1024': B_12_Wi_1024,
     'B_12-Wi_512': B_12_Wi_512,
     'B_6-Wi_1024': B_6_Wi_1024,
-    'B_6-Wi_512': B_6_Wi_512
+    'B_6-Wi_512': B_6_Wi_512,
+    'B_3-Wi_256': B_3_Wi_256,
 }
 
 
