@@ -226,7 +226,7 @@ def main(args):
             wandb.init(
                 **common_kwargs,
             )
-        wandb.run.name = f'pretrain {args.dataset} {args.architecture} {args.dropout}'
+        wandb.run.name = f'pretrain {args.dataset} {args.architecture} {args.dropout} rotations20'
         wandb_run_id = wandb.run.id
     else:
         wandb_run_id = 'NA'
@@ -252,7 +252,7 @@ def main(args):
                 'lr_sched': scheduler.state_dict()}
             torch.save(
                 checkpoint,
-                path + f"/wandb_{wandb_run_id}__epoch_{str(ep)}__compute_{str(current_compute)}__{args.architecture}__{args.dataset}__dropout_{args.dropout}"
+                path + f"/wandb_{wandb_run_id}__epoch_{str(ep)}__compute_{str(current_compute)}__{args.architecture}__{args.dataset}__dropout_{args.dropout}__rotations20"
             )
 
         if calc_stats:

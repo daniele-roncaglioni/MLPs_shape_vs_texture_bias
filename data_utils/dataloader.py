@@ -45,6 +45,7 @@ def get_loader_torch(
         transforms.ConvertImageDtype(torch.float32),
         transforms.CenterCrop(size=data_resolution),
         transforms.Resize(size=(crop_resolution, crop_resolution), antialias=True),
+        transforms.RandomRotation(20),
         transforms.Normalize(mean, std),
     ]
 
