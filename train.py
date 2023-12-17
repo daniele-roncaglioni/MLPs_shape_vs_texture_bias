@@ -226,14 +226,14 @@ def main(args):
             wandb.init(
                 **common_kwargs,
             )
-        wandb.run.name = f'pretrain {args.dataset} {args.architecture} {args.dropout} rotations20'
+        wandb.run.name = f'pretrain {args.dataset} {args.architecture} {args.dropout} rotations20 mixup'
         wandb_run_id = wandb.run.id
     else:
         wandb_run_id = 'NA'
 
     compute_per_epoch = get_compute(model, args.n_train, args.crop_resolution, device)
 
-    for ep in range(start_ep, args.epochs):
+    for ep in range(start_ep, args.epochs+1):
         calc_stats = ((ep + 1) % args.calculate_stats == 0) or (ep == 0)
 
         current_compute = compute_per_epoch * ep
@@ -252,7 +252,7 @@ def main(args):
                 'lr_sched': scheduler.state_dict()}
             torch.save(
                 checkpoint,
-                path + f"/wandb_{wandb_run_id}__epoch_{str(ep)}__compute_{str(current_compute)}__{args.architecture}__{args.dataset}__dropout_{args.dropout}__rotations20"
+                path + f"/wandb_{wandb_run_id}__epoch_{str(ep)}__compute_{str(current_compute)}__{args.architecture}__{args.dataset}__dropout_{args.dropout}__rotations20__mixup"
             )
 
         if calc_stats:
