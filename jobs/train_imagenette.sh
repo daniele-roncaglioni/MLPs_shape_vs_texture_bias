@@ -16,15 +16,17 @@
                                                  --dataset imagenette-160 \
                                                  --resolution 160  \
                                                  --crop_resolution 64 \
-                                                 --batch_size 512 \
+                                                 --batch_size 1024 \
                                                  --epochs 205 \
                                                  --save_freq 20 \
-                                                 --lr 0.01 \
-                                                 --weight_decay 0.0001            \
-                                                 --optimizer sgd                  \
+                                                 --lr 0.00003 \
+                                                 --weight_decay 0.001            \
+                                                 --optimizer lion                  \
                                                  --augment                        \
                                                  --smooth 0.3                     \
                                                  --wandb                          \
                                                  --wandb_project shape-vs-texture \
                                                  --calculate_stats 20  \
-                                                 --reload "${HOME}/scaling_mlps_mirror/train_checkpoints/imagenette-160/epoch_160_compute_85879351541760"
+                                                 --dropout 0.5 \
+                                                 --mixup 8.0
+#                                                 --reload "${HOME}/scaling_mlps_mirror/train_checkpoints/imagenette-160/epoch_160_compute_85879351541760"

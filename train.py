@@ -15,7 +15,7 @@ from models import get_architecture
 from data_utils.data_stats import *
 from data_utils.dataloader import get_loader
 from utils.get_compute import get_compute
-from utils.metrics import topk_acc, real_acc, AverageMeter
+from utils.metrics import topk_acc, real_acc, AverageMeter  # , count_parameters
 from utils.optimizer import get_optimizer, get_scheduler
 from utils.parsers import get_training_parser
 from datetime import datetime
@@ -145,7 +145,7 @@ def main(args):
     print(f"RUNNING ON {device}")
 
     model = get_architecture(**args.__dict__).to(device)
-
+    # count_parameters(model)
     # Count number of parameters for logging purposes
     args.num_params = sum(p.numel() for p in model.parameters() if p.requires_grad)
 
@@ -206,11 +206,11 @@ def main(args):
         }
         if args.reload:
             try:
-                params = torch.load(args.reload) #, map_location=torch.device(device))
+                params = torch.load(args.reload)  # , map_location=torch.device(device))
                 model.load_state_dict(params['model'])
                 opt.load_state_dict(params['optimizer'])
                 scheduler.load_state_dict(params['lr_sched'])
-                checkpoint_data = parse_checkpoint(os.path.split(args.reload)[1]) # args.reload.split("/")[-1])
+                checkpoint_data = parse_checkpoint(os.path.split(args.reload)[1])  # args.reload.split("/")[-1])
                 start_ep = int(checkpoint_data['epoch'])
                 args.epochs = args.epochs + start_ep
                 print(f"Reloaded {args.reload}, start epoch: {start_ep}")
@@ -233,7 +233,7 @@ def main(args):
 
     compute_per_epoch = get_compute(model, args.n_train, args.crop_resolution, device)
 
-    for ep in range(start_ep, args.epochs+1):
+    for ep in range(start_ep, args.epochs + 1):
         calc_stats = ((ep + 1) % args.calculate_stats == 0) or (ep == 0)
 
         current_compute = compute_per_epoch * ep
@@ -249,7 +249,8 @@ def main(args):
             checkpoint = {
                 'model': model.state_dict(),
                 'optimizer': opt.state_dict(),
-                'lr_sched': scheduler.state_dict()}
+                'lr_sched': scheduler.state_dict()
+            }
             torch.save(
                 checkpoint,
                 path + f"/wandb_{wandb_run_id}__epoch_{str(ep)}__compute_{str(current_compute)}__{args.architecture}__{args.dataset}__dropout_{args.dropout}__rotations20__mixup"

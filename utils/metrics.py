@@ -2,6 +2,9 @@ from torch import topk, any, sum
 import torch
 
 
+# from prettytable import PrettyTable
+
+
 class AverageMeter(object):
     """Computes and stores the average and current value"""
 
@@ -57,3 +60,16 @@ def real_acc(preds, targs, k, avg=False):
     acc_real = 1 / num * sum(any(top_1_inds.unsqueeze(dim=1).eq(targs), dim=1), dim=0)
 
     return acc_real
+
+# def count_parameters(model):
+#     table = PrettyTable(["Modules", "Parameters"])
+#     total_params = 0
+#     for name, parameter in model.named_parameters():
+#         if not parameter.requires_grad:
+#             continue
+#         params = parameter.numel()
+#         table.add_row([name, params])
+#         total_params += params
+#     print(table)
+#     print(f"Total Trainable Params: {total_params}")
+#     return total_params
