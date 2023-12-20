@@ -201,7 +201,7 @@ def main(args):
             'project': args.wandb_project,
             'entity': args.wandb_entity,
             'config': args.__dict__,
-            'tags': ["pretrain", timestamp, args.dataset, args.architecture, str(args.lr), str(args.weight_decay), args.optimizer, str(args.dropout)],
+            'tags': ["pretrain", timestamp, args.dataset, args.architecture, str(args.lr), str(args.weight_decay), args.optimizer, str(args.dropout), str(args.crop_resolution)],
             'dir': f'{Path(__file__).parent}/wandb/',
         }
         if args.reload:
@@ -226,7 +226,7 @@ def main(args):
             wandb.init(
                 **common_kwargs,
             )
-        wandb.run.name = f'pretrain {args.dataset} {args.architecture} {args.dropout} rotations20 mixup'
+        wandb.run.name = f'pretrain {args.dataset} {args.architecture} {args.dropout} rotations20 mixup {args.crop_resolution}'
         wandb_run_id = wandb.run.id
     else:
         wandb_run_id = 'NA'
@@ -253,7 +253,7 @@ def main(args):
             }
             torch.save(
                 checkpoint,
-                path + f"/wandb_{wandb_run_id}__epoch_{str(ep)}__compute_{str(current_compute)}__{args.architecture}__{args.dataset}__dropout_{args.dropout}__rotations20__mixup"
+                path + f"/wandb_{wandb_run_id}__epoch_{str(ep)}__compute_{str(current_compute)}__{args.architecture}__{args.dataset}__dropout_{args.dropout}__rotations20__mixup_{args.crop_resolution}"
             )
 
         if calc_stats:
