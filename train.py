@@ -148,6 +148,7 @@ def main(args):
     # count_parameters(model)
     # Count number of parameters for logging purposes
     args.num_params = sum(p.numel() for p in model.parameters() if p.requires_grad)
+    print("args.num_params", args.num_params)
 
     # Create unique identifier
     # name = config_to_name(args)
@@ -175,7 +176,8 @@ def main(args):
         data_resolution=args.resolution,
         crop_resolution=args.crop_resolution,
         crop_ratio=tuple(args.crop_ratio),
-        crop_scale=tuple(args.crop_scale)
+        crop_scale=tuple(args.crop_scale),
+        rotation=args.rotation
     )
 
     test_loader = get_loader(
@@ -201,16 +203,19 @@ def main(args):
             'project': args.wandb_project,
             'entity': args.wandb_entity,
             'config': args.__dict__,
-            'tags': ["pretrain", timestamp, args.dataset, args.architecture, str(args.lr), str(args.weight_decay), args.optimizer, str(args.dropout)],
+            'tags': ["pretrain", timestamp, args.dataset, args.architecture, str(args.lr), str(args.weight_decay), args.optimizer, str(args.dropout), str(args.crop_resolution), str(args.mixup), str(args.rotation)],
             'dir': f'{Path(__file__).parent}/wandb/',
         }
         if args.reload:
             try:
-                params = torch.load(args.reload)  # , map_location=torch.device(device))
+                params = torch.load(args.reload, map_location=torch.device(device))
                 model.load_state_dict(params['model'])
                 opt.load_state_dict(params['optimizer'])
                 scheduler.load_state_dict(params['lr_sched'])
                 checkpoint_data = parse_checkpoint(os.path.split(args.reload)[1])  # args.reload.split("/")[-1])
+                print("checkpoint_data", checkpoint_data)
+                assert str(checkpoint_data['mixup']) == str(args.mixup)
+                assert str(checkpoint_data['rotation']) == str(args.rotation)
                 start_ep = int(checkpoint_data['epoch'])
                 args.epochs = args.epochs + start_ep
                 print(f"Reloaded {args.reload}, start epoch: {start_ep}")
@@ -226,7 +231,7 @@ def main(args):
             wandb.init(
                 **common_kwargs,
             )
-        wandb.run.name = f'pretrain {args.dataset} {args.architecture} {args.dropout} rotations20 mixup'
+        wandb.run.name = f'pretrain {args.dataset} {args.architecture} {args.dropout} rotations{args.rotation} mixup{args.mixup} {args.crop_resolution}'
         wandb_run_id = wandb.run.id
     else:
         wandb_run_id = 'NA'
@@ -253,7 +258,7 @@ def main(args):
             }
             torch.save(
                 checkpoint,
-                path + f"/wandb_{wandb_run_id}__epoch_{str(ep)}__compute_{str(current_compute)}__{args.architecture}__{args.dataset}__dropout_{args.dropout}__rotations20__mixup"
+                path + f"/wandb_{wandb_run_id}__epoch_{str(ep)}__compute_{str(current_compute)}__{args.architecture}__{args.dataset}__dropout_{args.dropout}__rotation_{args.rotation}__mixup_{args.mixup}__{args.crop_resolution}"
             )
 
         if calc_stats:

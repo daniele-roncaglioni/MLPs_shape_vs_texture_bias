@@ -1,6 +1,7 @@
 import argparse
 from utils.optimizer import OPTIMIZERS_DICT, SCHEDULERS
 
+
 def get_training_parser():
     parser = argparse.ArgumentParser(description="Scaling MLPs")
 
@@ -144,6 +145,13 @@ def get_training_parser():
         help="Strength of mixup"
     )
 
+    parser.add_argument(
+        "--rotation",
+        default=20,
+        type=float,
+        help="Rotation Angle"
+    )
+
     # Logging
     parser.add_argument(
         "--calculate_stats",
@@ -193,6 +201,7 @@ def get_training_parser():
 
     return parser
 
+
 def get_stylize_parser():
     parser = argparse.ArgumentParser(description='Preprocess image dataset to create Stylized image dataset')
 
@@ -207,6 +216,7 @@ def get_stylize_parser():
     parser.add_argument("--dataset", default="imagenette-160", type=str, help="Dataset")
 
     return parser
+
 
 def get_finetune_parser():
     parser = argparse.ArgumentParser(description="Scaling MLPs")

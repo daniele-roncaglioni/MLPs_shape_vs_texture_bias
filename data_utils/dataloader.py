@@ -24,6 +24,7 @@ def get_loader_torch(
         mode,
         augment,
         dev,
+        rotation=None,
         data_resolution=None,
         crop_resolution=None,
         crop_ratio=(0.75, 1.3333333333333333),
@@ -31,7 +32,7 @@ def get_loader_torch(
         num_samples=None,
         dtype=torch.float32,
         mixup=None,
-        data_path='./beton'
+        data_path='./beton',
 ):
     mean = MEAN_DICT[dataset]
     std = STD_DICT[dataset]
@@ -45,9 +46,10 @@ def get_loader_torch(
         transforms.ConvertImageDtype(torch.float32),
         transforms.CenterCrop(size=data_resolution),
         transforms.Resize(size=(crop_resolution, crop_resolution), antialias=True),
-        transforms.RandomRotation(20),
+        transforms.RandomRotation(float(rotation or 0)),
         transforms.Normalize(mean, std),
     ]
+    print(repr(transforms_list))
 
     if augment:
         transforms_list += [
@@ -89,7 +91,7 @@ def get_loader_torch(
     else:
         collate_fn = None
 
-    return torch.utils.data.DataLoader(data, batch_size=bs, shuffle=True, collate_fn=collate_fn, num_workers=3)
+    return torch.utils.data.DataLoader(data, batch_size=bs, shuffle=True, collate_fn=collate_fn)
 
 
 # Define an ffcv dataloader
