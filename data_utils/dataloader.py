@@ -46,13 +46,13 @@ def get_loader_torch(
         transforms.ConvertImageDtype(torch.float32),
         transforms.CenterCrop(size=data_resolution),
         transforms.Resize(size=(crop_resolution, crop_resolution), antialias=True),
-        transforms.RandomRotation(float(rotation or 0)),
         transforms.Normalize(mean, std),
     ]
     print(repr(transforms_list))
 
-    if augment:
+    if augment and mode == 'train':
         transforms_list += [
+            transforms.RandomRotation(float(rotation or 0)),
             transforms.RandomResizedCrop((crop_resolution, crop_resolution), scale=crop_scale, ratio=crop_ratio, antialias=True),
             transforms.RandomHorizontalFlip()
         ]
