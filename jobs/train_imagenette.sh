@@ -18,7 +18,7 @@
                                                  --crop_resolution 64 \
                                                  --batch_size 1024 \
                                                  --epochs 601 \
-                                                 --save_freq  \
+                                                 --save_freq 100 \
                                                  --lr 0.00006 \
                                                  --weight_decay 0.001            \
                                                  --optimizer lion                  \
