@@ -6,6 +6,6 @@ __pycache__
 checkpoints
 data
 checkpoints_finetune
-wandb
+wandb*
 train_checkpoints
 *.pth

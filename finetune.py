@@ -19,10 +19,27 @@ from utils.optimizer import (
 )
 from train import train, test
 from datetime import datetime
+import random
 
 now = datetime.now()
 timestamp = now.strftime("%d-%m-%y, %H:%M")
 
+
+def whiten_random_pixels(image, num_pixels=16):
+    _, _, height, width = image.shape
+
+
+    if height * width < num_pixels:
+        raise ValueError("Das Bild ist zu klein für die Anzahl der geforderten Pixel.")
+
+    pixels = [(random.randint(0, width - 1), random.randint(0, height - 1)) for _ in range(num_pixels)]
+
+    white_pixel = torch.tensor([1.0, 1.0, 1.0])  # oder [255, 255, 255] für [0, 255] Bereich
+
+    for x, y in pixels:
+        image[:, :, y, x] = white_pixel
+
+    return image
 
 @torch.no_grad()
 def test_time_aug(model, loader, num_augs, args):
@@ -33,10 +50,32 @@ def test_time_aug(model, loader, num_augs, args):
         all_preds = torch.zeros(len(loader) * loader.batch_size, model.linear_out.out_features)
 
     for _ in tqdm(range(num_augs)):
+        
         targets = []
         cnt = 0
-
+        count=0
         for ims, targs in loader:
+            
+            print(count)
+
+            # 4 corners
+            # white_pixel = torch.tensor([1.0, 1.0, 1.0])  # oder [255, 255, 255] für [0, 255] Bereich
+
+            # # Erstellen Sie einen Tensor der richtigen Größe für die Ecken
+            # white_area = white_pixel.view(1, 3, 1, 1).expand(-1, -1, 2, 2)
+
+            # # Weisen Sie den weißen Bereich zu den Ecken zu
+            # ims[:, :, 0:2, 0:2] = white_area
+            # ims[:, :, -2:, 0:2] = white_area
+            # ims[:, :, 0:2, -2:] = white_area
+            # ims[:, :, -2:, -2:] = white_area
+                    # center
+            # white_pixel = torch.tensor([1.0, 1.0, 1.0])
+            # white_area = white_pixel.view(1, 3, 1, 1).expand(-1, -1, 4, 4)
+            # ims[:, :, 30:34, 30:34] = white_area
+
+            # random pixels
+            # ims=whiten_random_pixels(ims, num_pixels=16)
             ims = torch.reshape(ims, (ims.shape[0], -1))
             preds = model(ims)
 
@@ -44,17 +83,19 @@ def test_time_aug(model, loader, num_augs, args):
             targets.append(targs.detach().cpu())
 
             cnt += ims.shape[0]
+            count+=1
 
     all_preds = all_preds / num_augs
     targets = torch.cat(targets)
 
-    if args.dataset != 'imagenet_real':
-        acc, top5 = topk_acc(all_preds, targets, k=5, avg=True)
-    else:
-        acc = real_acc(all_preds, targets, k=5, avg=True)
-        top5 = 0.
+    # if args.dataset != 'imagenet_real':
+    acc, top5 = topk_acc(all_preds, targets, k=5, avg=True)
+    # else:
+    #     acc = real_acc(all_preds, targets, k=5, avg=True)
+    #     top5 = 0.
 
     return 100 * acc, 100 * top5
+
 
 
 def finetune(args):

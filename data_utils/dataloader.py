@@ -5,7 +5,7 @@ from typing import List
 import torch
 import torchvision
 from torch.utils.data import default_collate
-from torchvision.transforms import transforms, v2
+from torchvision.transforms import transforms#, v2
 
 from .data_stats import *
 
@@ -82,11 +82,11 @@ def get_loader_torch(
     else:
         raise ValueError
 
-    if mode == 'train' and augment and mixup > 0:
-        def collate_fn(batch):
-            return v2.MixUp(alpha=mixup, num_classes=CLASS_DICT[dataset])(*default_collate(batch))
-    else:
-        collate_fn = None
+    # if mode == 'train' and augment and mixup > 0:
+    #     def collate_fn(batch):
+    #         return v2.MixUp(alpha=mixup, num_classes=CLASS_DICT[dataset])(*default_collate(batch))
+    # else:
+    collate_fn = None
 
     return torch.utils.data.DataLoader(data, batch_size=bs, shuffle=True, collate_fn=collate_fn)
 
