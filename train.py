@@ -231,7 +231,7 @@ def main(args):
             wandb.init(
                 **common_kwargs,
             )
-        wandb.run.name = f'pretrain {args.dataset} {args.architecture} {args.dropout} rotations{args.rotation} mixup{args.mixup} {args.crop_resolution}'
+        wandb.run.name = f'pretrain {args.dataset} {args.architecture} {args.dropout} rotations{args.rotation} mixup{args.mixup} {args.crop_resolution} no_edges'
         wandb_run_id = wandb.run.id
     else:
         wandb_run_id = 'NA'
@@ -258,7 +258,7 @@ def main(args):
             }
             torch.save(
                 checkpoint,
-                path + f"/wandb_{wandb_run_id}__epoch_{str(ep)}__compute_{str(current_compute)}__{args.architecture}__{args.dataset}__dropout_{args.dropout}__rotation_{args.rotation}__mixup_{args.mixup}__{args.crop_resolution}"
+                path + f"/wandb_{wandb_run_id}__epoch_{str(ep)}__compute_{str(current_compute)}__{args.architecture}__{args.dataset}__dropout_{args.dropout}__rotation_{args.rotation}__mixup_{args.mixup}__{args.crop_resolution} no_edges"
             )
 
         if calc_stats:

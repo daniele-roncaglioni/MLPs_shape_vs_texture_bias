@@ -17,6 +17,12 @@ def get_loader(*args, **kwargs):
     except ImportError:
         return get_loader_torch(*args, **kwargs)
 
+def remove_edge_pixels(x):
+    x[:, :2] = 0
+    x[:, -2:] = 0
+    x[:2, :] = 0
+    x[-2:, :] = 0
+    return x
 
 def get_loader_torch(
         dataset,
@@ -54,10 +60,12 @@ def get_loader_torch(
         transforms_list += [
             transforms.RandomRotation(float(rotation or 0)),
             transforms.RandomResizedCrop((crop_resolution, crop_resolution), scale=crop_scale, ratio=crop_ratio, antialias=True),
-            transforms.RandomHorizontalFlip()
+            transforms.RandomHorizontalFlip(),
+            transforms.Lambda(lambda x: remove_edge_pixels(x))
         ]
     else:
-        transforms_list += [transforms.CenterCrop((crop_resolution, crop_resolution))]
+        transforms_list += [transforms.CenterCrop((crop_resolution, crop_resolution)),
+                            transforms.Lambda(lambda x: remove_edge_pixels(x))]
 
     transforms_pipeline = transforms.Compose(transforms_list)
     if dataset == 'cifar10':
@@ -91,7 +99,7 @@ def get_loader_torch(
     else:
         collate_fn = None
 
-    return torch.utils.data.DataLoader(data, batch_size=bs, shuffle=True, collate_fn=collate_fn, num_workers=2)
+    return torch.utils.data.DataLoader(data, batch_size=bs, shuffle=True, collate_fn=collate_fn)
 
 
 # Define an ffcv dataloader
