@@ -122,6 +122,33 @@ class BottleneckMLP(nn.Module):
         print('Load_state overrideoutput', self.load_state_dict(params, strict=False))
 
 
+    def load_override_adjusted(self, override_path):
+
+        params = {
+            k: v
+            for k, v in torch.load(override_path, map_location=self.load_device)['model'].items()
+        }
+
+        # Create a list of keys to iterate over
+        keys_list = list(params.keys())
+
+        for key in keys_list:
+            # Create the new key name
+            if key not in (['layernorms.3.weight', 'layernorms.3.bias']):
+                new_key = key.replace('3.weight', '2.weight').replace('3.bias', '2.bias')
+
+            # Check if the new key name is different from the old one
+            if new_key != key:
+                # Assign the value to the new key
+                params[new_key] = params[key]
+                # Delete the old key
+                del params[key]
+
+        # Load pre-trained parameters
+        self.load_state_dict(params, strict=False)
+        print('Load_state overrideoutput', self.load_state_dict(params, strict=False))
+
+
 class BottleneckBlock(nn.Module):
     def __init__(self, thin, wide, act=nn.GELU(), dropout=0.0):
         super(BottleneckBlock, self).__init__()

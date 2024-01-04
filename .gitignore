@@ -9,3 +9,5 @@ checkpoints_finetune
 wandb
 train_checkpoints
 *.pth
+*.jpg
+/checkpoints

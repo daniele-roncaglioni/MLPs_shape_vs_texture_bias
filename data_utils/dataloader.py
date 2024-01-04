@@ -18,10 +18,10 @@ def get_loader(*args, **kwargs):
         return get_loader_torch(*args, **kwargs)
 
 def remove_edge_pixels(x):
-    x[:, :2] = 0
-    x[:, -2:] = 0
-    x[:2, :] = 0
-    x[-2:, :] = 0
+    x[:, :, :2] = 0
+    x[:, :, -2:] = 0
+    x[:, :2, :] = 0
+    x[:, -2:, :] = 0
     return x
 
 def get_loader_torch(
