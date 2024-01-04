@@ -10,4 +10,5 @@ wandb
 train_checkpoints
 *.pth
 *.jpg
+/student_project/weight_exploration
 /checkpoints
