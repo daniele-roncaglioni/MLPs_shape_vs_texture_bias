@@ -8,9 +8,6 @@ import wandb
 from torch.nn import CrossEntropyLoss
 from tqdm import tqdm
 
-# from torchvision import datasets
-# from torchvision import transforms
-
 from models import get_architecture
 from data_utils.data_stats import *
 from data_utils.dataloader import get_loader
@@ -23,8 +20,6 @@ from datetime import datetime
 now = datetime.now()
 timestamp = now.strftime("%d-%m-%y, %H:%M")
 
-
-# import matplotlib.pyplot as plt
 
 def parse_checkpoint(path):
     split_checkpoint_path = path.split("__")
@@ -49,30 +44,9 @@ def train(model, opt, scheduler, loss_fn, epoch, train_loader, device, args):
         targs = targs.to(device)
         ims = ims.to(device)
 
-        # print images for debugging
-        # idx = 20
-        # test_img = ims[idx].clone().detach()
-        # test_img = transforms.Normalize(torch.mean(ims[idx]), torch.std(ims[idx]))(test_img)
-        # plt.imshow(test_img[2])
-        # plt.show()
-
         ims = torch.reshape(ims, (ims.shape[0], -1))
         preds = model(ims)
 
-        # if args.mixup > 0:
-        #     targs_perm = targs[:, 1].long()
-        #     weight = targs[0, 2].squeeze()
-        #     targs = targs[:, 0].long()
-        #     if weight != -1:
-        #         loss = loss_fn(preds, targs) * weight + loss_fn(preds, targs_perm) * (
-        #                 1 - weight
-        #         )
-        #     else:
-        #         loss = loss_fn(preds, targs)
-        #         targs_perm = None
-        # else:
-        #     loss = loss_fn(preds, targs)
-        #     targs_perm = None
         loss = loss_fn(preds, targs)
         targs_perm = None
 
@@ -203,7 +177,8 @@ def main(args):
             'project': args.wandb_project,
             'entity': args.wandb_entity,
             'config': args.__dict__,
-            'tags': ["pretrain", timestamp, args.dataset, args.architecture, str(args.lr), str(args.weight_decay), args.optimizer, str(args.dropout), str(args.crop_resolution), str(args.mixup), str(args.rotation)],
+            'tags': ["pretrain", timestamp, args.dataset, args.architecture, str(args.lr), str(args.weight_decay),
+                     args.optimizer, str(args.dropout), str(args.crop_resolution), str(args.mixup), str(args.rotation)],
             'dir': f'{Path(__file__).parent}/wandb/',
         }
         if args.reload:
